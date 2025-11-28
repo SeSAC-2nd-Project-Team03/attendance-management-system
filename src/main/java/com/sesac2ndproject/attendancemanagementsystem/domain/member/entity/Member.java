@@ -24,5 +24,5 @@ public class Member extends BaseTimeEntity {
     private String phoneNumber;
 
     private String address;
-    
+
 }
