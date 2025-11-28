@@ -1,57 +1,52 @@
 server:
-  port: 8080
-  servlet:
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
+  port: 9090
 
 spring:
   # ----------------------------------------
-  # ?? [??] H2 ?????? ?? (?? ???)
+  # 🗄️ [공통] H2 데이터베이스 설정 (설치 불필요)
   # ----------------------------------------
   datasource:
-    url: jdbc:h2:mem:testdb;MODE=MySQL  # ??? DB ?? (MySQL ?? ??)
+    url: jdbc:h2:mem:testdb;MODE=MySQL  # 메모리 DB 사용 (MySQL 모드 호환)
     driver-class-name: org.h2.Driver
     username: sa
-    password:           # ???? ??
+    password:           # 비밀번호 없음
 
   h2:
     console:
-      enabled: true     # ?????? DB ?? ???? ??
-      path: /h2-console # ?? ??: http://localhost:8080/h2-console
+      enabled: true     # 브라우저에서 DB 조회 가능하게 설정
+      path: /h2-console # 접속 주소: http://localhost:8080/h2-console
 
   # ----------------------------------------
-  # ?? [??] JPA (ORM) ??
+  # 🏗️ [공통] JPA (ORM) 설정
   # ----------------------------------------
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update  # ?? ? ? ??? ?? ??/?? (create-drop? ???? ???)
+      ddl-auto: update  # 서버 켤 때 테이블 자동 생성/변경 (create-drop은 켤때마다 날아감)
     properties:
       hibernate:
-        format_sql: true # ??? SQL ??? ??
-        show_sql: true   # ???? SQL? ??? ???
+        format_sql: true # 로그에 SQL 예쁘게 출력
+        show_sql: true   # 실행되는 SQL을 콘솔에 보여줌
 
   # ----------------------------------------
-  # ? [Team C] ?? ??? ?? ??
+  # 📂 [Team C] 파일 업로드 제한 설정
   # ----------------------------------------
   servlet:
     multipart:
-      max-file-size: 10MB      # ?? ??? ?? ??
-      max-request-size: 10MB   # ?? ?? ?? ??
+      max-file-size: 10MB      # 파일 하나당 최대 크기
+      max-request-size: 10MB   # 요청 전체 최대 크기
 
 # ==========================================
-# ? [Team A] JWT ??? ??
+# 🔐 [Team A] JWT 커스텀 설정
 # ==========================================
 jwt:
-  # HS512 ????? ?? 64???(512??) ??? ? ???? ?????.
-  # ??? ?? ????. (?? ??? application-secret.yml? ?? ??)
+  # HS512 알고리즘을 위해 64바이트(512비트) 이상의 긴 문자열이 필요합니다.
+  # 개발용 임시 키입니다. (배포 시에는 application-secret.yml로 분리 권장)
   secret: "v3ryS3cr3tK3yF0rH4ck4th0nPjjjuuu888777666555444333222111!!!@@@###$$$"
-  expiration: 3600000 # 1?? (??? ??: 1000 * 60 * 60)
+  expiration: 3600000 # 1시간 (밀리초 단위: 1000 * 60 * 60)
 
 # ==========================================
-# ? [Team C] ?? ?? ?? ??? ??
+# 📂 [Team C] 파일 저장 경로 커스텀 설정
 # ==========================================
 file:
-  upload-dir: ./uploads  # ???? ?? ??? 'uploads' ?? ?? ? ??
+  upload-dir: ./uploads  # 프로젝트 루트 폴더에 'uploads' 폴더 생성 후 저장
