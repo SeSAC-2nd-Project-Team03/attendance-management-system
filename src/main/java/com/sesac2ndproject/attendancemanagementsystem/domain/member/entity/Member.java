@@ -1,6 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.member.entity;
 
 import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
+import com.sesac2ndproject.attendancemanagementsystem.global.type.RoleType;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,5 +25,9 @@ public class Member extends BaseTimeEntity {
     private String phoneNumber;
 
     private String address;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private RoleType role;
 
 }

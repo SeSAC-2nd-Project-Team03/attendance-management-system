@@ -20,6 +20,7 @@ spring:
   # 🏗️ [공통] JPA (ORM) 설정
   # ----------------------------------------
   jpa:
+    defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: update  # 서버 켤 때 테이블 자동 생성/변경 (create-drop은 켤때마다 날아감)
@@ -27,6 +28,7 @@ spring:
       hibernate:
         format_sql: true # 로그에 SQL 예쁘게 출력
         show_sql: true   # 실행되는 SQL을 콘솔에 보여줌
+
 
   # ----------------------------------------
   # 📂 [Team C] 파일 업로드 제한 설정
