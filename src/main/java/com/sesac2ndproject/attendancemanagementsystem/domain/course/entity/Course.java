@@ -17,5 +17,5 @@ public class Course extends BaseTimeEntity {
     @Column(nullable = false)
     private String courseName;
 
-    private String description; 
+    private String description;
 }
