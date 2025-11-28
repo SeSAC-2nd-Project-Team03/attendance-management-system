@@ -1,4 +1,21 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.course.entity;
 
-public class Course {
+import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Getter
+@NoArgsConstructor
+public class Course extends BaseTimeEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String courseName;
+
+    private String description;
 }

@@ -5,10 +5,11 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum AttendanceType {
-    MORNING("아침"),
-    LUNCH("점심"),
-    DINNER("저녁");
+public enum EnrollmentStatus {
+    ACTIVE("수강중"),
+    COMPLETED("수료"),
+    DROPPED("중도포기"),
+    WAITING("승인대기");
 
     private final String description;
 }

@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum AttendanceType {
-    MORNING("아침"),
-    LUNCH("점심"),
-    DINNER("저녁");
+public enum RoleType {
+    ROLE_USER("일반 사용자"),
+    ROLE_ADMIN("관리자");
 
     private final String description;
 }
