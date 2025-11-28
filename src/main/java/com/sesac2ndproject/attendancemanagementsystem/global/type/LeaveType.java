@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum AttendanceType {
-    MORNING("아침"),
-    LUNCH("점심"),
-    DINNER("저녁");
+public enum LeaveType {
+    EARLY_LEAVE("조퇴"),
+    ABSENCE("결석/공가"),
+    SICK_LEAVE("병가");
 
     private final String description;
 }
