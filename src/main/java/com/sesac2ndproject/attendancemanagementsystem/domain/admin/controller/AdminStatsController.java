@@ -1,9 +1,37 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.controller;
 
+import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.StatsResponseDTO;
+import com.sesac2ndproject.attendancemanagementsystem.domain.admin.service.AdminStatsService;
+import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/admin")
+@RequiredArgsConstructor
 public class AdminStatsController {
+
+    private final AdminStatsService adminStatsService;
+
     // - **조회 로직 (Query)**
     //    - [ ]  **과정별 수강생 조회:** `Enrollment`를 통해 특정 과정(Course)을 듣는 `memberId` 목록 추출.
+    @GetMapping("/enrollment")
+    public ResponseEntity<List<Enrollment>> findMemberIdsByCourseId(@RequestParam Long courseId) {
+
+        List<Enrollment> memberList = adminStatsService.findMemberIdsByCourseId(courseId);
+
+        return ResponseEntity.ok(memberList);
+    }
     //    - [ ]  **통합 출석부 조회:** 날짜 + 과정ID를 받으면 → 해당 수강생들의 `DailyAttendance`와 `DetailedAttendance`를 조인(또는 Fetch)하여 가져오기.
+    @GetMapping("/attendances")
+    public ResponseEntity<StatsResponseDTO> findDailyAttendance(@RequestParam LocalDateTime workDate, @RequestParam Long courseId){return null;}
     //- **API 개발 (관리자용)**
     //    - [ ]  **전체 출석 현황 조회 API** (`GET /api/v1/admin/attendances`): 날짜별, 과정별 전체 학생의 출석 상태 리스트 반환14.
     //    - [ ]  **조퇴/결석 승인 처리 API** (`PATCH /api/v1/admin/leaves/{id}`): 신청 상태를 `APPROVED`로 변경15.
