@@ -4,6 +4,8 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Membe
 import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +14,8 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Enrollment extends BaseTimeEntity {
 
     @Id
@@ -20,10 +24,11 @@ public class Enrollment extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
-    private Member memberId;
+    private Member member;
 
-    @Column(nullable = false)
-    private Long courseId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "course_id", nullable = false)
+    private Course course;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
