@@ -46,11 +46,11 @@ VALUES (101, 1, 'DINNER', '9999', '2025-11-28', '18:00:00', now(), now());
 
 -- 5. [Team B & D 데이터] 일일 출석부 (DailyAttendance) 생성
 -- 김철수(2)의 11월 28일 출석부 (아직 하루가 안 끝나서 상태는 NONE으로 가정)
-INSERT INTO daily_attendance (member_id, date, final_status, created_at, updated_at)
+INSERT INTO daily_attendance (member_id, date, status, created_at, updated_at)
 VALUES (2, '2025-11-28', 'NONE', now(), now());
 
 -- 이영희(3)의 11월 28일 출석부
-INSERT INTO daily_attendance (member_id, date, final_status, created_at, updated_at)
+INSERT INTO daily_attendance (member_id, date, status, created_at, updated_at)
 VALUES (3, '2025-11-28', 'NONE', now(), now());
 
 
