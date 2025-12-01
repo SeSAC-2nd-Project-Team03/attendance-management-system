@@ -1,6 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.service;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.DailyAttendanceDTO;
+import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.StatsRequestDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
@@ -27,8 +28,8 @@ public class AdminStatsService {
     }
     //    - [ ]  **통합 출석부 조회:** 날짜 + 과정ID를 받으면 → 해당 수강생들의 `DailyAttendance`와 `DetailedAttendance`를 조인(또는 Fetch)하여 가져오기.
 
-    public List<DailyAttendanceDTO.ResponseByDateAndCourseIdDTO> findByDateAndCourseId(LocalDate workDate, Long courseId) {
-        List<DailyAttendanceDTO.ResponseByDateAndCourseIdDTO> foundList = enrollmentRepository.integratedAttendance(workDate,courseId);
+    public List<ResponseByDateAndCourseIdDTO> findByDateAndCourseId(LocalDate workDate, Long courseId) {
+        List<ResponseByDateAndCourseIdDTO> foundList = enrollmentRepository.integratedAttendance(workDate,courseId);
         return foundList;
     }
 

@@ -1,6 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.course.repository;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.DailyAttendanceDTO;
+import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,13 +22,11 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findMemberIdByCourseId(Long courseId);
 
     // Team D 쿼리 2 : *통합 출석부 조회:** 날짜 + 과정ID를 받으면 → 해당 수강생들의 `DailyAttendance`와 `DetailedAttendance`를 조인(또는 Fetch)하여 가져오기.
-    @Query(
-            "SELECT new com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.DailyAttendanceDTO.ResponseByDateAndCourseIdDTO(" +
-            "da.dailyAttendanceId, da.memberId, er.courseId, da.date, da.finalStatus, " +
-            "dea.sessionType, dea.checkTime, dea.inputNumber) " +
+    @Query("SELECT da.id, da.memberId, er.courseId, da.date, da.status, dea.dailyAttendanceId," +
+                    " dea.type, dea.inputNumber, dea.checkTime, dea.connectionIp, dea.isVerified" +
             " FROM DailyAttendance AS da" +
             " JOIN Enrollment AS er ON da.memberId = er.memberId" +
             " JOIN DetailedAttendance AS dea ON da.memberId = dea.memberId" +
             " WHERE da.date = :workDate AND er.courseId = :courseId")
-    List<DailyAttendanceDTO.ResponseByDateAndCourseIdDTO> integratedAttendance(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
+    List<ResponseByDateAndCourseIdDTO> integratedAttendance(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
 }
