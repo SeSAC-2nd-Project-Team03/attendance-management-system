@@ -1,5 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.service;
 
+import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.DailyAttendanceDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.StatsRequestDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
@@ -7,7 +8,9 @@ import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStat
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,6 +26,11 @@ public class AdminStatsService {
         return foundEnrollment;
     }
     //    - [ ]  **통합 출석부 조회:** 날짜 + 과정ID를 받으면 → 해당 수강생들의 `DailyAttendance`와 `DetailedAttendance`를 조인(또는 Fetch)하여 가져오기.
+
+    public List<DailyAttendanceDTO.ResponseByDateAndCourseIdDTO> findByDateAndCourseId(LocalDate workDate, Long courseId) {
+        List<DailyAttendanceDTO.ResponseByDateAndCourseIdDTO> foundList = enrollmentRepository.integratedAttendance(workDate,courseId);
+        return foundList;
+    }
 
     //- **API 개발 (관리자용)**
     //    - [ ]  **전체 출석 현황 조회 API** (`GET /api/v1/admin/attendances`): 날짜별, 과정별 전체 학생의 출석 상태 리스트 반환14.
