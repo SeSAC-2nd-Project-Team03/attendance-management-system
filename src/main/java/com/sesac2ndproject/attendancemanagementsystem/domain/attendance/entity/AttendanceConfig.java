@@ -13,7 +13,15 @@ import java.time.LocalTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "attendance_config") // DB 테이블명 명시
+@Table(
+        name = "attendance_config",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_course_date_session",
+                        columnNames = {"courseId", "targetDate", "sessionType"}
+                )
+        }
+)
 public class AttendanceConfig extends BaseTimeEntity {
 
     @Id
