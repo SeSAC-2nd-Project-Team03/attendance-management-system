@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Entity // 👈 이 녀석이 범인일 확률 99%
+@Entity
 @Getter
 @NoArgsConstructor
 public class DailyAttendance extends BaseTimeEntity {
