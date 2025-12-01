@@ -7,9 +7,4 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AttendanceService {
 
-    // 회원 찾기
-
-    // 비밀번호 확인
-
-    // 인증 성공 -> 토큰 생성
 }
