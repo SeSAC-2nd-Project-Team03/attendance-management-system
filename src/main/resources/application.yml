@@ -44,7 +44,7 @@ spring:
 jwt:
   # HS512 알고리즘을 위해 64바이트(512비트) 이상의 긴 문자열이 필요합니다.
   # 개발용 임시 키입니다. (배포 시에는 application-secret.yml로 분리 권장)
-  secret: "v3ryS3cr3tK3yF0rH4ck4th0nPjjjuuu888777666555444333222111!!!@@@###$$$"
+  secret: "v3rY-s3cr3t-k3y-f0r-Att3ndanc3-M4nag3m3nt-Sy5t3m-k3y-must-b3-l0ng-3nough"
   expiration: 3600000 # 1시간 (밀리초 단위: 1000 * 60 * 60)
 
 # ==========================================
