@@ -1,6 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.course.repository;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.DailyAttendanceDTO;
+import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseAttendanceByDateDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
@@ -29,4 +30,13 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
             " JOIN DetailedAttendance AS dea ON da.memberId = dea.memberId" +
             " WHERE da.date = :workDate AND er.courseId = :courseId")
     List<ResponseByDateAndCourseIdDTO> integratedAttendance(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
+
+    // Team D 쿼리 3 :
+    @Query("SELECT da, mem.name, cor.id, cor.courseName, enr.status" +
+            " FROM DailyAttendance da" +
+            " JOIN Member mem ON da.memberId= mem.id" +
+            " JOIN Enrollment enr ON da.memberId = enr.memberId" +
+            " JOIN Course cor ON enr.courseId = cor.id" +
+            " WHERE da.date = :date AND :date >= cor.startDate AND :date <= cor.endDate")
+    List<ResponseAttendanceByDateDTO> attendanceListByDate(@Param("date") LocalDate date);
 }
