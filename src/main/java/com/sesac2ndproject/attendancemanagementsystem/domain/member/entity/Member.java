@@ -3,12 +3,13 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.member.entity;
 import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.RoleType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class Member extends BaseTimeEntity {
 
     @Id
@@ -29,5 +30,6 @@ public class Member extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private RoleType role;
+
 
 }

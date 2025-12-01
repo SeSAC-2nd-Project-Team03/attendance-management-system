@@ -10,8 +10,9 @@ import java.util.List;
 
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
-    // Team D가 사용할 쿼리 예시 1:
-    // "특정 강의(courseId)를 듣고 있는(ACTIVE) 학생들의 ID만 다 내놔"
-    @Query("SELECT e.memberId FROM Enrollment e WHERE e.courseId = :courseId AND e.status = :status")
-    List<Long> findMemberIdsByCourseIdAndStatus(@Param("courseId") Long courseId, @Param("status") EnrollmentStatus status);
+    @Query("SELECT e.member.id FROM Enrollment e WHERE e.course.id = :courseId AND e.status = :status")
+    List<Long> findMemberIdsByCourseIdAndStatus(
+            @Param("courseId") Long courseId,
+            @Param("status") EnrollmentStatus status
+    );
 }
