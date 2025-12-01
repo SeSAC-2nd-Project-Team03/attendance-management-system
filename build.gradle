@@ -74,8 +74,8 @@ dependencies {
     // ==========================================
     // 📄 [문서화] Swagger/OpenAPI (All Teams)
     // ==========================================
-    // API 명세서 자동 생성 (http://localhost:8080/swagger-ui/index.html)
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.5'
+    // API 명세서 자동 생성 (http://localhost:9090/swagger-ui/index.html)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
 
     // ==========================================
     // 🧪 [테스트] (All Teams)
