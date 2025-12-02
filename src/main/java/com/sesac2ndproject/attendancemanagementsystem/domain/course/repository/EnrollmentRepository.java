@@ -16,27 +16,39 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
     // Team D가 사용할 쿼리 예시 1:
     // "특정 강의(courseId)를 듣고 있는(ACTIVE) 학생들의 ID만 다 내놔"
-    @Query("SELECT e.memberId FROM Enrollment e WHERE e.courseId = :courseId AND e.status = :status")
+    @Query("SELECT e.member FROM Enrollment e WHERE e.course = :courseId AND e.status = :status")
     List<Long> findMemberIdsByCourseIdAndStatus(@Param("courseId") Long courseId, @Param("status") EnrollmentStatus status);
 
     // Team D 쿼리 1 : 해당하는 courseId를 가지고 Member들만 찾아오기.
     List<Enrollment> findMemberIdByCourseId(Long courseId);
 
     // Team D 쿼리 2 : *통합 출석부 조회:** 날짜 + 과정ID를 받으면 → 해당 수강생들의 `DailyAttendance`와 `DetailedAttendance`를 조인(또는 Fetch)하여 가져오기.
-    @Query("SELECT da.id, da.memberId, er.courseId, da.date, da.status, dea.dailyAttendanceId," +
+    @Query("SELECT da.id, da.memberId, enr.course, da.date, da.status, dea.dailyAttendanceId," +
                     " dea.type, dea.inputNumber, dea.checkTime, dea.connectionIp, dea.isVerified" +
             " FROM DailyAttendance AS da" +
-            " JOIN Enrollment AS er ON da.memberId = er.memberId" +
+            " JOIN Enrollment AS enr ON da.memberId = enr.member.id" +
             " JOIN DetailedAttendance AS dea ON da.memberId = dea.memberId" +
-            " WHERE da.date = :workDate AND er.courseId = :courseId")
+            " WHERE da.date = :workDate AND enr.course = :courseId")
     List<ResponseByDateAndCourseIdDTO> integratedAttendance(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
 
     // Team D 쿼리 3 :
-    @Query("SELECT da, mem.name, cor.id, cor.courseName, enr.status" +
+//    @Query("SELECT da, mem.name, cor.id, cor.courseName, enr.status" +
+//            " FROM DailyAttendance da" +
+//            " JOIN Member mem ON da.memberId= mem.id" +
+//            " JOIN Enrollment enr ON da.memberId = enr.member.id" +
+//            " JOIN Course cor ON enr.id = cor.id" +
+//            " WHERE da.date = :date AND :date >= cor.startDate AND :date <= cor.endDate")
+//    List<ResponseAttendanceByDateDTO> attendanceListByDate(@Param("date") LocalDate date);
+    @Query("SELECT new com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseAttendanceByDateDTO$FlatResponse(" +
+            "da.id, da.memberId, er.course.id, da.date, da.status, dea) " +
             " FROM DailyAttendance da" +
-            " JOIN Member mem ON da.memberId= mem.id" +
-            " JOIN Enrollment enr ON da.memberId = enr.memberId" +
-            " JOIN Course cor ON enr.courseId = cor.id" +
-            " WHERE da.date = :date AND :date >= cor.startDate AND :date <= cor.endDate")
-    List<ResponseAttendanceByDateDTO> attendanceListByDate(@Param("date") LocalDate date);
+            // Daily(Long) <=> Enrollment(Member객체) 연결: er.member.memberId 사용
+            " JOIN Enrollment er ON da.memberId = er.member.id" +
+            // Daily <=> Detailed 연결: attendanceId 사용 (LEFT JOIN 권장: 상세기록 없어도 출석부는 나오게)
+            " LEFT JOIN DetailedAttendance dea ON da.id = dea.dailyAttendanceId" +
+            // Enrollment(Course객체) <=> 파라미터(Long) 비교: er.course.courseId 사용
+            " WHERE da.date = :workDate AND er.course.id = :courseId")
+    List<ResponseAttendanceByDateDTO.FlatResponse> findIntegratedAttendanceFlat(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
+
+
 }

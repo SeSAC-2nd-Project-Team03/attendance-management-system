@@ -1,11 +1,13 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.controller;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.DailyAttendanceDTO;
+import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseAttendanceByDateDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.StatsResponseDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.service.AdminStatsService;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,9 +45,15 @@ public class AdminStatsController {
     //- **API 개발 (관리자용)**
     //    - [ ]  **전체 출석 현황 조회 API** (`GET /api/v1/admin/attendances`): 날짜별, 과정별 전체 학생의 출석 상태 리스트 반환14
     // 날짜 -> DAILY_ATTENDANCE 반환. COURSE의 start_date와 end_date 사이에 있는 코스를 반환.
-    @GetMapping("/attendances")
-    public ResponseEntity<Enrollment> findDailyAttendanceByDate(@RequestParam LocalDate date) {
-        return null;
+    @GetMapping("/daily-attendance")
+    public ResponseEntity<List<ResponseAttendanceByDateDTO>> getDailyAttendanceList(
+            //날짜 형식을 "yyyy-MM-dd"로 받기 위해 어노테이션 사용
+            @RequestParam("workDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate workDate,
+            @RequestParam("courseId") Long courseId
+    ) {
+        List<ResponseAttendanceByDateDTO> result = adminStatsService.getDailyAttendance(workDate, courseId);
+
+        return ResponseEntity.ok(result);
     }
     //    - [ ]  **조퇴/결석 승인 처리 API** (`PATCH /api/v1/admin/leaves/{id}`): 신청 상태를 `APPROVED`로 변경15.
     //        - *(Tip: 승인 시 Team B의 `DailyAttendance` 상태를 업데이트하는 로직을 호출하거나, Team B와 협의 필요)*

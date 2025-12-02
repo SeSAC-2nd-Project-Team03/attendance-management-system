@@ -8,14 +8,19 @@ import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStat
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdminStatsService {
 
     private final EnrollmentRepository enrollmentRepository;
@@ -38,9 +43,40 @@ public class AdminStatsService {
     // 쿼리: "특정 날짜(date)에, 이 학생들(memberIds)의 출석부 다 가져와"
     // (Team D가 Enrollment에서 학생 ID 목록을 먼저 구해오면, 여기서 그 ID들로 조회함)
     // 날짜 -> DAILY_ATTENDANCE 반환. COURSE의 start_date와 end_date 사이에 있는 코스를 반환.
-    public List<ResponseAttendanceListByDateDTO> findDailyAttendanceBydate(LocalDate date) {
-        List<ResponseAttendanceByDateDTO> attendance = enrollmentRepository.attendanceListByDate(date);
-        List<ResponseAttendanceListByDateDTO> attendanceList = 
+    public List<ResponseAttendanceByDateDTO> getDailyAttendance(LocalDate workDate, Long courseId) {
+
+        // 1. DB에서 납작한 데이터 가져오기 (FlatResponse 리스트)
+        List<ResponseAttendanceByDateDTO.FlatResponse> flatList =
+                enrollmentRepository.findIntegratedAttendanceFlat(workDate, courseId);
+
+        // 2. 조립을 위한 Map 생성 (Key: 일일출석부 ID)
+        Map<Long, ResponseAttendanceByDateDTO> resultMap = new HashMap<>();
+
+        for (ResponseAttendanceByDateDTO.FlatResponse flat : flatList) {
+            Long id = flat.getDailyAttendanceId();
+
+            // 2-1. Map에 해당 출석부(Key)가 없으면 바구니(DTO) 새로 만들기
+            if (!resultMap.containsKey(id)) {
+                ResponseAttendanceByDateDTO dto = ResponseAttendanceByDateDTO.builder()
+                        .dailyAttendanceId(flat.getDailyAttendanceId())
+                        .memberId(flat.getMemberId())
+                        .courseId(flat.getCourseId())
+                        .workDate(flat.getWorkDate())
+                        .totalStatus(flat.getTotalStatus())
+                        .detailedAttendanceList(new ArrayList<>()) // 리스트 초기화
+                        .build();
+                resultMap.put(id, dto);
+            }
+
+            // 2-2. 상세 출석 기록(detail)이 존재하면 리스트에 추가
+            // (LEFT JOIN이라 null일 수도 있으므로 체크)
+            if (flat.getDetailedAttendance() != null) {
+                resultMap.get(id).addDetail(flat.getDetailedAttendance());
+            }
+        }
+
+        // 3. Map의 값들(Value)만 리스트로 변환하여 반환
+        return new ArrayList<>(resultMap.values());
     }
 
     //    - [ ]  **조퇴/결석 승인 처리 API** (`PATCH /api/v1/admin/leaves/{id}`): 신청 상태를 `APPROVED`로 변경15.
