@@ -1,16 +1,15 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.member.controller;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberCreateRequest;
+import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberResponse;
+import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 

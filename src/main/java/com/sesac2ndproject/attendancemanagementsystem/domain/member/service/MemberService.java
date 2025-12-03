@@ -1,9 +1,11 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.member.service;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberCreateRequest;
+import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,10 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberService {
-
-    // 중복된 아이디가 있으면 안됨
-    // 비밀번호는 절대 평문으로 저장하면 안됨
-    // 관리자와 학생을 구분해서 저장해야 함
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
@@ -42,4 +40,5 @@ public class MemberService {
         Member savedMember = memberRepository.save(member);
         return savedMember.getId();
     }
+
 }
