@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @Tag(name = "Member (Admin)", description = "관리자용 회원 관리 API")
 @RestController
@@ -26,5 +27,12 @@ public class AdminMemberController {
     public ResponseEntity<Void> createMember(@Valid @RequestBody MemberCreateRequest request) {
         Long memberId = memberService.createMember(request);
         return ResponseEntity.created(URI.create("/api/v1/admin/members" + memberId)).build();
+    }
+
+    @Operation(summary = "전체 회원 조회", description = "시스템에 등록된 모든 회원의 목록을 조회합니다")
+    @GetMapping
+    public ResponseEntity<List<MemberResponse>> getAllMembers() {
+        List<MemberResponse> members = memberService.getAllMembers();
+        return ResponseEntity.ok(members);
     }
 }
