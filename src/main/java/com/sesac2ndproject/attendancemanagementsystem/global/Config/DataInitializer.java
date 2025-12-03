@@ -1,5 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.global.Config;
 
+
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DetailedAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Course;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+
 
 @Component
 @RequiredArgsConstructor

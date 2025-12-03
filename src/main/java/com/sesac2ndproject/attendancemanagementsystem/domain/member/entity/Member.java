@@ -32,7 +32,4 @@ public class Member extends BaseTimeEntity {
     private RoleType role;
 
 
-
-
-
 }
