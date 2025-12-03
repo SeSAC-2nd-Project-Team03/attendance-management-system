@@ -4,6 +4,8 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberCr
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.repository.MemberRepository;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.CustomException;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +25,7 @@ public class MemberService {
     public Long createMember(MemberCreateRequest request) {
         // 중복 검사
         if (memberRepository.existsByLoginId(request.getLoginId())) {
-            throw new IllegalArgumentException("이미 존재하는 아이디입니다" + request.getLoginId());
+            throw new CustomException(ErrorCode.DUPLICATE_LOGIN_ID);
         }
 
         // 비밀번호 암호화
