@@ -48,8 +48,14 @@ public class SecurityConfig {
                         // H2 DB 콘솔도 누구나 접속 가능
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        // 회원가입/로그인 등 Auth 관련도 누구나 접속 가능
-                        .requestMatchers("/api/v1/auth/**", "/api/v1/admin/**").permitAll()
+                        // 1. 관리자 전용 경로 (/api/v1/admin/**) -> ADMIN 권한만 가능
+                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // 2. 일반 사용자 경로 (/api/v1/members/**) -> 인증된 누구나 가능 (USER, ADMIN 모두)
+                        .requestMatchers("/api/v1/members/**").authenticated()
+
+                        // 3. 인증 관련 (로그인 등) -> 누구나 가능
+                        .requestMatchers("/api/v1/auth/**").permitAll()
 
                         // 나머지는 무조건 인증 필요
                         .anyRequest().authenticated()

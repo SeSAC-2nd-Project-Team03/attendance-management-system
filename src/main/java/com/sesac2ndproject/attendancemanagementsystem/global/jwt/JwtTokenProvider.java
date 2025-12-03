@@ -45,7 +45,7 @@ public class JwtTokenProvider {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
-                .parseClaimsJwt(token)
+                .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
 
@@ -53,12 +53,13 @@ public class JwtTokenProvider {
 
     // 토큰 유효성 검사
     public boolean validateToken(String token) {
+        System.out.println(">>> [디버깅] 전달받은 토큰 값: [" + token + "]");
         try {
             Jwts
                     .parserBuilder()
                     .setSigningKey(key)
                     .build()
-                    .parseClaimsJwt(token);
+                    .parseClaimsJws(token);
 
             return true;
         } catch (SecurityException | MalformedJwtException e) {
