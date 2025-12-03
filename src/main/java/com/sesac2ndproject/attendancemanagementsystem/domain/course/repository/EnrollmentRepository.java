@@ -14,10 +14,6 @@ import java.util.List;
 
 public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
 
-    // Team D가 사용할 쿼리 예시 1:
-    // "특정 강의(courseId)를 듣고 있는(ACTIVE) 학생들의 ID만 다 내놔"
-    @Query("SELECT e.member FROM Enrollment e WHERE e.course = :courseId AND e.status = :status")
-    List<Long> findMemberIdsByCourseIdAndStatus(@Param("courseId") Long courseId, @Param("status") EnrollmentStatus status);
 
     // Team D 쿼리 1 : 해당하는 courseId를 가지고 Member들만 찾아오기.
     List<Enrollment> findMemberIdByCourseId(Long courseId);
@@ -51,4 +47,9 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<ResponseAttendanceByDateDTO.FlatResponse> findIntegratedAttendanceFlat(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
 
 
+    @Query("SELECT e.member.id FROM Enrollment e WHERE e.course.id = :courseId AND e.status = :status")
+    List<Long> findMemberIdsByCourseIdAndStatus(
+            @Param("courseId") Long courseId,
+            @Param("status") EnrollmentStatus status
+    );
 }

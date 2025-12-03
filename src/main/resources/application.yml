@@ -14,7 +14,7 @@ spring:
   h2:
     console:
       enabled: true     # 브라우저에서 DB 조회 가능하게 설정
-      path: /h2-console # 접속 주소: http://localhost:8080/h2-console
+      path: /h2-console # 접속 주소: http://localhost:9090/h2-console
 
   # ----------------------------------------
   # 🏗️ [공통] JPA (ORM) 설정
