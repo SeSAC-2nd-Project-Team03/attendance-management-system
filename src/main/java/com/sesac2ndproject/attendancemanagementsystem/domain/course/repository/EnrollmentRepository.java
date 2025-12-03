@@ -23,11 +23,11 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<Enrollment> findMemberIdByCourseId(Long courseId);
 
     // Team D 쿼리 2 : *통합 출석부 조회:** 날짜 + 과정ID를 받으면 → 해당 수강생들의 `DailyAttendance`와 `DetailedAttendance`를 조인(또는 Fetch)하여 가져오기.
-    @Query("SELECT da.id, da.memberId, enr.course, da.date, da.status, dea.dailyAttendanceId," +
-                    " dea.type, dea.inputNumber, dea.checkTime, dea.connectionIp, dea.isVerified" +
+    @Query("SELECT new com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO(" +
+            " da.id, da.memberId, enr.course.id, da.date, da.status, dea)" +
             " FROM DailyAttendance AS da" +
             " JOIN Enrollment AS enr ON da.memberId = enr.member.id" +
-            " JOIN DetailedAttendance AS dea ON da.memberId = dea.memberId" +
+            " LEFT JOIN DetailedAttendance AS dea ON da.memberId = dea.memberId" +  /* 상세 기록이 없어도 가져오도록 LEFT JOIN으로 처리. 단 NULL값 주의 */
             " WHERE da.date = :workDate AND enr.course = :courseId")
     List<ResponseByDateAndCourseIdDTO> integratedAttendance(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
 

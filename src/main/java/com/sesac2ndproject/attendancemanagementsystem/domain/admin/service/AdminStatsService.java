@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional(readOnly = true) // 조회 성능 최적화
 public class AdminStatsService {
 
     private final EnrollmentRepository enrollmentRepository;
