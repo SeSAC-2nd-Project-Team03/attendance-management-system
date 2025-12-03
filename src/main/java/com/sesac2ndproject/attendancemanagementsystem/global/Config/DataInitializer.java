@@ -1,11 +1,15 @@
 package com.sesac2ndproject.attendancemanagementsystem.global.Config;
 
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DetailedAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Course;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.CourseRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.repository.MemberRepository;
+import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
+import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.RoleType;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +19,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Component
 @RequiredArgsConstructor
@@ -24,6 +29,7 @@ public class DataInitializer implements CommandLineRunner {
     private final PasswordEncoder passwordEncoder;
     private final CourseRepository courseRepository;
     private final EnrollmentRepository enrollmentRepository;
+    private final DetailedAttendanceRepository detailedAttendanceRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -68,6 +74,43 @@ public class DataInitializer implements CommandLineRunner {
             enrollmentRepository.save(createEnrollment(s2, javaCourse));
             System.out.println("수강신청 데이터 초기화 완료");
         }
+
+        Member s1 = memberRepository.findByLoginId("student1").orElseThrow();
+
+        // 5. 출석 상세 기록
+        // 시나리오: student1은 오늘 '아침', '점심'은 찍었고, '저녁'은 아직 안 찍음
+
+        if (detailedAttendanceRepository.count() == 0) {
+            LocalDate today = LocalDate.now();
+
+            // 1) 아침 출석
+            detailedAttendanceRepository.save(DetailedAttendance.builder()
+                    .memberId(s1.getId())
+                    .dailyAttendanceId(0L) // 💡 임시 ID
+                    .type(AttendanceType.MORNING)
+                    .inputNumber("1234")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(8, 55))) // 날짜 정보는 여기에 포함됨
+                    .connectionIp("127.0.0.1")
+                    .isVerified(true)
+                    .build());
+
+            // 2) 점심 출석
+            detailedAttendanceRepository.save(DetailedAttendance.builder()
+                    .memberId(s1.getId())
+                    .dailyAttendanceId(0L) // 💡 임시 ID
+                    .type(AttendanceType.LUNCH)
+                    .inputNumber("5678")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(13, 15)))
+                    .connectionIp("127.0.0.1")
+                    .isVerified(true)
+                    .build());
+
+            // 3) 저녁 출석 (데이터 없음 - 퇴근 안 찍음)
+            // 일부러 안 넣음 -> Person 2가 이걸 보고 '결석/조퇴' 처리하는 로직을 테스트해야 함.
+
+            System.out.println("✅ [Person 2용] 출석 상세 더미 데이터 생성 완료 (아침:O, 점심:지각, 저녁:X)");
+        }
+
     }
 
     // 학생 생성 헬퍼 메서드
