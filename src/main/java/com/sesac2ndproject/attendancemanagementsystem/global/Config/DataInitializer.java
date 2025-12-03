@@ -34,7 +34,7 @@ public class DataInitializer implements CommandLineRunner {
                     .loginId("admin")
                     .password(passwordEncoder.encode("1234"))
                     .name("관리자")
-                    .role(RoleType.ROLE_ADMIN)
+                    .role(RoleType.ADMIN)
                     .build();
             memberRepository.save(admin);
             System.out.println("관리자 계정 생성 완료");
@@ -78,7 +78,7 @@ public class DataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("1234"))
                     .name(name)
                     .phoneNumber(phone)
-                    .role(RoleType.ROLE_USER)
+                    .role(RoleType.USER)
                     .build();
             memberRepository.save(student);
             System.out.println("학생 계정(" + loginId + ") 생성 완료");
