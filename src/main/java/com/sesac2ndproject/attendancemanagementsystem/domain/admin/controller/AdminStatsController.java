@@ -6,6 +6,7 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseB
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.StatsResponseDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.service.AdminStatsService;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class AdminStatsController {
     // - **조회 로직 (Query)**
     //    - [ ]  **과정별 수강생 조회:** `Enrollment`를 통해 특정 과정(Course)을 듣는 `memberId` 목록 추출.
     @GetMapping("/enrollment")
+    @Operation(summary ="과정별 수강생 조회", description = "courseId를 입력하여 Enrollment(강좌의 수강생 목록에서 해당하는 것들을 반환")
     public ResponseEntity<List<Enrollment>> findMemberIdsByCourseId(@RequestParam Long courseId) {
 
         List<Enrollment> memberList = adminStatsService.findMemberIdsByCourseId(courseId);
@@ -37,6 +39,7 @@ public class AdminStatsController {
     }
     //    - [ ]  **통합 출석부 조회:** 날짜 + 과정ID를 받으면 → 해당 수강생들의 `DailyAttendance`와 `DetailedAttendance`를 조인(또는 Fetch)하여 가져오기.
     @GetMapping("/attendances")
+    @Operation(summary = "통합 출석부 조회", description = "Date와 courseId를 받아서 Enrollment, DailyAttendance, DetailedAttendance 등을 조인하여 리스트를 반환.")
     public ResponseEntity<List<ResponseByDateAndCourseIdDTO>> findDailyAttendance(@RequestParam LocalDate date, @RequestParam Long courseId){
 
         List<ResponseByDateAndCourseIdDTO> dailyAttendanceList = adminStatsService.findByDateAndCourseId(date, courseId);
@@ -46,6 +49,7 @@ public class AdminStatsController {
     //    - [ ]  **전체 출석 현황 조회 API** (`GET /api/v1/admin/attendances`): 날짜별, 과정별 전체 학생의 출석 상태 리스트 반환14
     // 날짜 -> DAILY_ATTENDANCE 반환. COURSE의 start_date와 end_date 사이에 있는 코스를 반환.
     @GetMapping("/daily-attendance")
+    @Operation(summary = "전체 출석 현황 조회", description = "Date와 courseId로 조회")
     public ResponseEntity<List<ResponseAttendanceByDateDTO>> getDailyAttendanceList(
             //날짜 형식을 "yyyy-MM-dd"로 받기 위해 어노테이션 사용
             @RequestParam("workDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate workDate,
