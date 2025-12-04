@@ -36,15 +36,28 @@ public class AdminMemberController {
         List<MemberResponse> members = memberService.getAllMembers();
         return ResponseEntity.ok(members);
     }
-    
+
     @Operation(summary = "회원 정보 수정", description = "관리자가 회원의 정보를 수정합니다")
     @PatchMapping("/{memberId}")
     public ResponseEntity<Void> updateMemberInfo(
-            @PathVariable Long memberId,
+            @PathVariable String loginId,
             @RequestBody MemberUpdateRequest request
     ) {
-        memberService.updateMemberByAdmin(memberId, request);
+        memberService.updateMemberByAdmin(loginId, request);
         return ResponseEntity.ok().build();
     }
 
+    @Operation(summary = "회원 삭제", description = "관리자가 회원을 강제 탈퇴시킵니다.")
+    @DeleteMapping("/{loginId}")
+    public ResponseEntity<Void> deleteMember(@PathVariable String loginId) {
+        memberService.deleteMember(loginId); // Service에도 메서드 추가 필요
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "개인 회원 조회", description = "관리자가 회원 개인을 조회합니다")
+    @GetMapping("/{loginId}")
+    public ResponseEntity<MemberResponse> getMember(@PathVariable String loginId) {
+        MemberResponse member = memberService.getMember(loginId);
+        return ResponseEntity.ok(member);
+    }
 }

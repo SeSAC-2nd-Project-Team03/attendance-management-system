@@ -53,10 +53,18 @@ public class MemberService {
                 .toList();
     }
 
+    /// 개인 회원 조회
+    public MemberResponse getMember(String loginId) {
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        return MemberResponse.from(member);
+    }
+
     /// 멤버 정보 수정 - user
     @Transactional
-    public void updateMember(Long id, MemberUpdateRequest request) {
-        Member member = memberRepository.findById(id)
+    public void updateMember(String loginId, MemberUpdateRequest request) {
+        Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         if (request.getPassword() != null && !request.getPassword().isBlank()) {
@@ -69,10 +77,19 @@ public class MemberService {
 
     /// 멤버 정보 수정 - admin
     @Transactional
-    public void updateMemberByAdmin(Long id, MemberUpdateRequest request) {
-        Member member = memberRepository.findById(id)
+    public void updateMemberByAdmin(String loginId, MemberUpdateRequest request) {
+        Member member = memberRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         member.updateInfo(request.getPhonenumber(), request.getPhonenumber());
+    }
+
+    /// 멤버 정보 삭제 - admin
+    @Transactional
+    public void deleteMember(String loginId) {
+        Member member = memberRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        memberRepository.delete(member);
     }
 }

@@ -29,7 +29,7 @@ public class MemberController {
             @AuthenticationPrincipal Member member,
             @RequestBody MemberUpdateRequest request
     ) {
-        memberService.updateMember(member.getId(), request);
+        memberService.updateMember(member.getLoginId(), request);
         return ResponseEntity.ok().build();
     }
 }
