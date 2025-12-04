@@ -22,7 +22,10 @@ public enum ErrorCode {
 
     // Member (회원 관련)
     MEMBER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 회원을 찾을 수 없습니다."),
-    DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다.");
+    DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
+
+    // AttendanceConfig(출석 설정)
+    DUPLICATE_ATTENDANCE_CONFIG(HttpStatus.CONFLICT, "이미 존재하는 출석 설정입니다.");
 
     private final HttpStatus status;
     private final String message;
