@@ -1,6 +1,5 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.course.repository;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.DailyAttendanceDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseAttendanceByDateDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
