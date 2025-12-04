@@ -1,6 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
+import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveType;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class LeaveRequest {
+public class LeaveRequest extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
