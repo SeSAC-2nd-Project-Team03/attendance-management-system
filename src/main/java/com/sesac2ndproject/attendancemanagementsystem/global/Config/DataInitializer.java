@@ -49,9 +49,10 @@ public class DataInitializer implements CommandLineRunner {
             System.out.println("관리자 계정 생성 완료");
         }
 
-        // 2. 학생 계정 생성 (student1, student2)
+        // 2. 학생 계정 생성 (student1, student2, student3)
         createStudentIfAbsent("student1", "김철수", "010-1111-2222");
         createStudentIfAbsent("student2", "이영희", "010-3333-4444");
+        createStudentIfAbsent("student3", "박조퇴", "010-5555-6666");
 
         // 3. 과정(Course) 생성 및 가져오기
         Course javaCourse;
@@ -72,9 +73,11 @@ public class DataInitializer implements CommandLineRunner {
         if (enrollmentRepository.count() == 0) {
             Member s1 = memberRepository.findByLoginId("student1").orElseThrow();
             Member s2 = memberRepository.findByLoginId("student2").orElseThrow();
+            Member s3 = memberRepository.findByLoginId("student3").orElseThrow();
 
             enrollmentRepository.save(createEnrollment(s1, javaCourse));
             enrollmentRepository.save(createEnrollment(s2, javaCourse));
+            enrollmentRepository.save(createEnrollment(s3, javaCourse));
             System.out.println("수강신청 데이터 초기화 완료");
         }
 
@@ -125,43 +128,141 @@ public class DataInitializer implements CommandLineRunner {
         }
 
         Member s1 = memberRepository.findByLoginId("student1").orElseThrow();
+        Member s2 = memberRepository.findByLoginId("student2").orElseThrow();
+        Member s3 = memberRepository.findByLoginId("student3").orElseThrow();
 
         // ============================================
-        // 5. 출석 상세 기록 (기존 코드 - Person 2용)
+        // 5. 출석 상세 기록 (Person 2용)
         // ============================================
         if (detailedAttendanceRepository.count() == 0) {
             LocalDate today = LocalDate.now();
 
-            // 1) 아침 출석 (성공)
+            // ============================================
+            // 🔵 케이스 1: 모두 출석 (student1)
+            // 아침(O) + 점심(O) + 저녁(O) → PRESENT
+            // ============================================
+            
+            // 1) 아침 출석 (정시)
             detailedAttendanceRepository.save(DetailedAttendance.builder()
                     .memberId(s1.getId())
                     .courseId(javaCourse.getId())
-                    .dailyAttendanceId(null)  // ✅ Person 2가 나중에 업데이트
+                    .dailyAttendanceId(null)
                     .type(AttendanceType.MORNING)
                     .inputNumber("1234")
-                    .checkTime(LocalDateTime.of(today, LocalTime.of(8, 55)))
-                    .connectionIp("127.0.0.1")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(8, 55)))  // 08:55 (정시)
+                    .connectionIp("192.168.1.100")
                     .isVerified(true)
                     .failReason(null)
                     .build());
 
-            // 2) 점심 출석 (지각 - 실패)
+            // 2) 점심 출석 (정시)
             detailedAttendanceRepository.save(DetailedAttendance.builder()
                     .memberId(s1.getId())
                     .courseId(javaCourse.getId())
                     .dailyAttendanceId(null)
                     .type(AttendanceType.LUNCH)
                     .inputNumber("5678")
-                    .checkTime(LocalDateTime.of(today, LocalTime.of(13, 35)))  // 마감 후
-                    .connectionIp("127.0.0.1")
-                    .isVerified(false)
-                    .failReason("출석 가능 시간이 아닙니다. (출석 가능: 13:10 ~ 13:30)")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(13, 15)))  // 13:15 (정시)
+                    .connectionIp("192.168.1.100")
+                    .isVerified(true)
+                    .failReason(null)
                     .build());
 
-            // 3) 저녁 출석 (데이터 없음 - 퇴근 안 찍음)
-            // 일부러 안 넣음 -> Person 2가 이걸 보고 '결석/조퇴' 처리하는 로직을 테스트
+            // 3) 저녁 출석 (정시)
+            detailedAttendanceRepository.save(DetailedAttendance.builder()
+                    .memberId(s1.getId())
+                    .courseId(javaCourse.getId())
+                    .dailyAttendanceId(null)
+                    .type(AttendanceType.DINNER)
+                    .inputNumber("9999")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(17, 55)))  // 17:55 (정시)
+                    .connectionIp("192.168.1.100")
+                    .isVerified(true)
+                    .failReason(null)
+                    .build());
 
-            System.out.println("✅ [Person 2용] 출석 상세 더미 데이터 생성 완료 (아침:O, 점심:지각, 저녁:X)");
+            System.out.println("🔵 [student1] 모두 출석: 아침(O) + 점심(O) + 저녁(O) → PRESENT");
+
+            // ============================================
+            // 🟡 케이스 2: 지각 (student2)
+            // 아침(X) + 점심(O) + 저녁(O) → LATE
+            // ============================================
+            
+            // 1) 아침 결석 (시간 초과)
+            detailedAttendanceRepository.save(DetailedAttendance.builder()
+                    .memberId(s2.getId())
+                    .courseId(javaCourse.getId())
+                    .dailyAttendanceId(null)
+                    .type(AttendanceType.MORNING)
+                    .inputNumber("1234")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(9, 30)))  // 09:30 (마감 후)
+                    .connectionIp("192.168.1.101")
+                    .isVerified(false)
+                    .failReason("출석 가능 시간이 아닙니다. (출석 가능: 08:50 ~ 09:10)")
+                    .build());
+
+            // 2) 점심 출석 (정시)
+            detailedAttendanceRepository.save(DetailedAttendance.builder()
+                    .memberId(s2.getId())
+                    .courseId(javaCourse.getId())
+                    .dailyAttendanceId(null)
+                    .type(AttendanceType.LUNCH)
+                    .inputNumber("5678")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(13, 20)))  // 13:20 (정시)
+                    .connectionIp("192.168.1.101")
+                    .isVerified(true)
+                    .failReason(null)
+                    .build());
+
+            // 3) 저녁 출석 (정시)
+            detailedAttendanceRepository.save(DetailedAttendance.builder()
+                    .memberId(s2.getId())
+                    .courseId(javaCourse.getId())
+                    .dailyAttendanceId(null)
+                    .type(AttendanceType.DINNER)
+                    .inputNumber("9999")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(18, 0)))  // 18:00 (정시)
+                    .connectionIp("192.168.1.101")
+                    .isVerified(true)
+                    .failReason(null)
+                    .build());
+
+            System.out.println("🟡 [student2] 지각: 아침(X) + 점심(O) + 저녁(O) → LATE");
+
+            // ============================================
+            // 🟠 케이스 3: 조퇴 (student3)
+            // 아침(O) + 점심(O) + 저녁(X) → LEAVE
+            // ============================================
+            
+            // 1) 아침 출석 (정시)
+            detailedAttendanceRepository.save(DetailedAttendance.builder()
+                    .memberId(s3.getId())
+                    .courseId(javaCourse.getId())
+                    .dailyAttendanceId(null)
+                    .type(AttendanceType.MORNING)
+                    .inputNumber("1234")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(8, 58)))  // 08:58 (정시)
+                    .connectionIp("192.168.1.102")
+                    .isVerified(true)
+                    .failReason(null)
+                    .build());
+
+            // 2) 점심 출석 (정시)
+            detailedAttendanceRepository.save(DetailedAttendance.builder()
+                    .memberId(s3.getId())
+                    .courseId(javaCourse.getId())
+                    .dailyAttendanceId(null)
+                    .type(AttendanceType.LUNCH)
+                    .inputNumber("5678")
+                    .checkTime(LocalDateTime.of(today, LocalTime.of(13, 12)))  // 13:12 (정시)
+                    .connectionIp("192.168.1.102")
+                    .isVerified(true)
+                    .failReason(null)
+                    .build());
+
+            // 3) 저녁 출석 없음 (조퇴) - 아예 기록 안 남김!
+
+            System.out.println("🟠 [student3] 조퇴: 아침(O) + 점심(O) + 저녁(X) → LEAVE");
         }
     }
 
