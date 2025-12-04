@@ -9,7 +9,8 @@ public enum AttendanceStatus {
     PRESENT("출석"),
     LATE("지각"),
     ABSENT("결석"),
-    NONE("미체크"); // 아직 시간이 안 돼서 안 찍은 상태
+    NONE("미체크"),  // 아직 시간이 안 돼서 안 찍은 상태
+    LEAVE("조퇴");
 
     private final String description;
 }
