@@ -2,6 +2,7 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.member.controller;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberCreateRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberResponse;
+import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberUpdateRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,4 +36,15 @@ public class AdminMemberController {
         List<MemberResponse> members = memberService.getAllMembers();
         return ResponseEntity.ok(members);
     }
+    
+    @Operation(summary = "회원 정보 수정", description = "관리자가 회원의 정보를 수정합니다")
+    @PatchMapping("/{memberId}")
+    public ResponseEntity<Void> updateMemberInfo(
+            @PathVariable Long memberId,
+            @RequestBody MemberUpdateRequest request
+    ) {
+        memberService.updateMemberByAdmin(memberId, request);
+        return ResponseEntity.ok().build();
+    }
+
 }

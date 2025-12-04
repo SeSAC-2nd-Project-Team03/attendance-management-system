@@ -2,6 +2,7 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.member.service;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberCreateRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberResponse;
+import com.sesac2ndproject.attendancemanagementsystem.domain.member.dto.MemberUpdateRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.repository.MemberRepository;
 import com.sesac2ndproject.attendancemanagementsystem.global.error.CustomException;
@@ -21,6 +22,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
 
+    /// 멤버 생성
     @Transactional
     public Long createMember(MemberCreateRequest request) {
         // 중복 검사
@@ -44,10 +46,33 @@ public class MemberService {
         return savedMember.getId();
     }
 
+    /// 전체 멤버 조회
     public List<MemberResponse> getAllMembers() {
         return memberRepository.findAll().stream()
                 .map(MemberResponse::from)
                 .toList();
     }
 
+    /// 멤버 정보 수정 - user
+    @Transactional
+    public void updateMember(Long id, MemberUpdateRequest request) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            String encodedPassword = passwordEncoder.encode(request.getPassword());
+            member.updatePassword(encodedPassword);
+        }
+
+        member.updateInfo(request.getPhonenumber(), request.getPhonenumber());
+    }
+
+    /// 멤버 정보 수정 - admin
+    @Transactional
+    public void updateMemberByAdmin(Long id, MemberUpdateRequest request) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
+
+        member.updateInfo(request.getPhonenumber(), request.getPhonenumber());
+    }
 }
