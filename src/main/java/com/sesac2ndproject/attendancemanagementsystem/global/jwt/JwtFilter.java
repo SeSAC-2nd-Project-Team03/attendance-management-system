@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // DB에서 회원 정보 조회
             Member member = memberRepository.findByLoginId(loginId)
-                    .orElseThrow(null);
+                    .orElse(null);
 
             if (member != null) {
                 Authentication authentication = new UsernamePasswordAuthenticationToken(

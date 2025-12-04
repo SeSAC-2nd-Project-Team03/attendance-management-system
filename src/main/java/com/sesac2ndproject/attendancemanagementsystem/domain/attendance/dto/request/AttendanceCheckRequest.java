@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class AttendanceCheckRequest {
 
     @NotNull(message = "회원 ID는 필수입니다.")
-    private Long memberId;  // ✅ 추가: SecurityUtil 대신 직접 받기
+    private Long memberId;
 
     @NotNull(message = "강의 ID는 필수입니다.")
     private Long courseId;

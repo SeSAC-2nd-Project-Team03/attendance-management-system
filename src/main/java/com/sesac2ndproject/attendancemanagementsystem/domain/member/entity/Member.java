@@ -32,4 +32,12 @@ public class Member extends BaseTimeEntity {
     private RoleType role;
 
 
+    public void updatePassword(String encryptedPassword) {
+        this.password = encryptedPassword;
+    }
+
+    public void updateInfo(String phoneNumber, String address) {
+        if (phoneNumber != null) this.phoneNumber = phoneNumber;
+        if (address != null) this.address = address;
+    }
 }
