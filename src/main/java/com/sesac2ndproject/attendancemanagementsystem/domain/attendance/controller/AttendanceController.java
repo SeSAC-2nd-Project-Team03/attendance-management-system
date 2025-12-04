@@ -3,7 +3,9 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.control
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.request.AttendanceAutoCheckRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.request.AttendanceCheckRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response.AttendanceCheckResponse;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response.MyAttendanceResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.service.AttendanceService;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.service.AttendanceStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -15,25 +17,24 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 /**
- * Person 1: 출석 체크 API 컨트롤러
- * 
- * ✅ 통합 기능:
- * - 기본 출석 체크 (타입 직접 지정)
- * - 자동 출석 체크 (시간 기반 타입 자동 판단)
- * - 레거시 API 지원 (/api/attendance/check-in)
+ * 출석 관리 API
  */
 @Slf4j
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
-@Tag(name = "출석 관리", description = "출석 체크 및 관리 API")
+@Tag(name = "출석 관리", description = "출석 체크 및 조회 API")
 public class AttendanceController {
 
     private final AttendanceService attendanceService;
+    private final AttendanceStatusService attendanceStatusService;
 
     /**
      * 출석 체크 API (타입 직접 지정)
@@ -212,19 +213,15 @@ public class AttendanceController {
     }
 
     /**
-     * 레거시 출석 체크 API (다운로드 파일 호환)
+     * 레거시 출석 체크 API
      */
     @PostMapping("/attendance/check-in")
-    @Operation(summary = "출석 체크 (레거시)", description = "레거시 경로 호환용 출석 체크 API")
+    @Operation(summary = "출석 체크 (레거시)", description = "레거시 경로 호환용")
     public ResponseEntity<AttendanceCheckResponse> checkIn(
             @Valid @RequestBody AttendanceCheckRequest request,
             HttpServletRequest httpRequest
     ) {
-        log.info("POST /api/attendance/check-in (레거시) - memberId: {}, courseId: {}, type: {}",
-                request.getMemberId(), request.getCourseId(), request.getType());
-
         String connectionIp = extractIpAddress(httpRequest);
-
         AttendanceCheckResponse response = attendanceService.checkAttendance(
                 request.getMemberId(),
                 request.getCourseId(),
@@ -232,12 +229,43 @@ public class AttendanceController {
                 request.getInputNumber(),
                 connectionIp
         );
-
         return ResponseEntity.ok(response);
     }
 
     /**
-     * HTTP 요청에서 실제 IP 주소 추출
+     * 내 출석 조회 API
+     */
+    @GetMapping("/v1/attendances/me")
+    @Operation(
+            summary = "내 출석 조회",
+            description = """
+            특정 날짜의 출석 현황을 조회합니다.
+            
+            **상태 계산 규칙:**
+            - O + O + O → 출석
+            - △ + O + O → 지각
+            - X + O + O → 지각
+            - O + O + X → 조퇴
+            - X + X + X → 결석
+            """
+    )
+    public ResponseEntity<MyAttendanceResponse> getMyAttendance(
+            @Parameter(description = "회원 ID") @RequestParam Long memberId,
+            @Parameter(description = "강의 ID") @RequestParam Long courseId,
+            @Parameter(description = "조회 날짜 (기본: 오늘)") 
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
+    ) {
+        if (date == null) {
+            date = LocalDate.now();
+        }
+        log.info("GET /api/v1/attendances/me - memberId: {}, courseId: {}, date: {}", memberId, courseId, date);
+        
+        MyAttendanceResponse response = attendanceStatusService.getMyAttendance(memberId, courseId, date);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * IP 주소 추출
      */
     private String extractIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
