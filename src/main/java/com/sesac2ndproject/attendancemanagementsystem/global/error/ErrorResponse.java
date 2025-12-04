@@ -1,29 +1,46 @@
 package com.sesac2ndproject.attendancemanagementsystem.global.error;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.ResponseEntity;
 
 import java.time.LocalDateTime;
 
+/**
+ * 에러 응답 DTO
+ */
 @Getter
 @Builder
 public class ErrorResponse {
-    private final LocalDateTime timestamp = LocalDateTime.now();
-    private final int status;
-    private final String error;
+
     private final String code;
     private final String message;
 
-    public static ResponseEntity<ErrorResponse> toResponseEntity(ErrorCode errorCode) {
-        return ResponseEntity
-                .status(errorCode.getStatus())
-                .body(ErrorResponse.builder()
-                        .status(errorCode.getStatus().value())
-                        .error(errorCode.getStatus().name())
-                        .code(errorCode.name())
-                        .message(errorCode.getMessage())
-                        .build()
-                );
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private final LocalDateTime timestamp;
+
+    public static ErrorResponse of(ErrorCode errorCode) {
+        return ErrorResponse.builder()
+                .code(errorCode.getCode())
+                .message(errorCode.getMessage())
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    public static ErrorResponse of(ErrorCode errorCode, String message) {
+        return ErrorResponse.builder()
+                .code(errorCode.getCode())
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
+    }
+
+    public static ErrorResponse of(String code, String message) {
+        return ErrorResponse.builder()
+                .code(code)
+                .message(message)
+                .timestamp(LocalDateTime.now())
+                .build();
     }
 }
+

@@ -1,78 +1,138 @@
 package com.sesac2ndproject.attendancemanagementsystem.global.error;
 
+import com.sesac2ndproject.attendancemanagementsystem.global.error.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * 전역 예외 처리기
+ */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
     /**
-     * 1. 비즈니스 로직 에러 (CustomException) 처리
-     * 예: 중복 아이디, 회원 없음, 비밀번호 불일치 등
+     * 인증번호 오류 예외 처리
      */
-    @ExceptionHandler(CustomException.class)
-    protected ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
-        log.error("handleCustomException: {}", e.getErrorCode());
-        return ErrorResponse.toResponseEntity(e.getErrorCode());
+    @ExceptionHandler(InvalidAuthNumberException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidAuthNumberException(InvalidAuthNumberException e) {
+        log.warn("InvalidAuthNumberException: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(ErrorCode.INVALID_AUTH_NUMBER, e.getMessage()));
     }
 
     /**
-     * 2. @Valid 유효성 검사 실패 처리
-     * AdminMemberController 등에서 @RequestBody @Valid 실패 시 발생
+     * 출석 시간 만료 예외 처리
+     */
+    @ExceptionHandler(AttendanceTimeExpiredException.class)
+    public ResponseEntity<ErrorResponse> handleAttendanceTimeExpiredException(AttendanceTimeExpiredException e) {
+        log.warn("AttendanceTimeExpiredException: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(ErrorCode.ATTENDANCE_TIME_EXPIRED, e.getMessage()));
+    }
+
+    /**
+     * 중복 출석 예외 처리
+     */
+    @ExceptionHandler(DuplicateAttendanceException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateAttendanceException(DuplicateAttendanceException e) {
+        log.warn("DuplicateAttendanceException: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(ErrorCode.DUPLICATE_ATTENDANCE, e.getMessage()));
+    }
+
+    /**
+     * 출석 설정 미존재 예외 처리
+     */
+    @ExceptionHandler(AttendanceConfigNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAttendanceConfigNotFoundException(AttendanceConfigNotFoundException e) {
+        log.warn("AttendanceConfigNotFoundException: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ErrorResponse.of(ErrorCode.ATTENDANCE_CONFIG_NOT_FOUND, e.getMessage()));
+    }
+
+    /**
+     * 출석 관련 기본 예외 처리
+     */
+    @ExceptionHandler(AttendanceException.class)
+    public ResponseEntity<ErrorResponse> handleAttendanceException(AttendanceException e) {
+        log.warn("AttendanceException: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of("A000", e.getMessage()));
+    }
+
+    /**
+     * Validation 예외 처리 (@Valid)
      */
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e) {
-        log.error("handleMethodArgumentNotValid: {}", e.getMessage());
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.warn("MethodArgumentNotValidException: {}", e.getMessage());
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("잘못된 입력값입니다.");
 
-        Map<String, String> errors = new HashMap<>();
-        e.getBindingResult().getFieldErrors().forEach(error ->
-                errors.put(error.getField(), error.getDefaultMessage())
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-                "status", HttpStatus.BAD_REQUEST.value(),
-                "error", "VALIDATION_FAILED",
-                "message", "입력값이 유효하지 않습니다.",
-                "details", errors
-        ));
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, message));
     }
 
     /**
-     * 3. 권한 없음 (AccessDeniedException)
-     * SecurityConfig에서 권한이 없는 요청을 했을 때 발생
+     * BindException 예외 처리
      */
-    @ExceptionHandler(AccessDeniedException.class)
-    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e) {
-        log.error("handleAccessDeniedException: {}", e.getMessage());
-        return ErrorResponse.toResponseEntity(ErrorCode.FORBIDDEN);
+    @ExceptionHandler(BindException.class)
+    public ResponseEntity<ErrorResponse> handleBindException(BindException e) {
+        log.warn("BindException: {}", e.getMessage());
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .findFirst()
+                .map(error -> error.getDefaultMessage())
+                .orElse("잘못된 입력값입니다.");
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, message));
     }
 
     /**
-     * 4. 인증 실패 (AuthenticationException)
-     * 로그인 실패 등
+     * IllegalArgumentException 예외 처리 (기존 코드 호환)
      */
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ErrorResponse> handleAuthenticationException(AuthenticationException e) {
-        log.error("handleAuthenticationException: {}", e.getMessage());
-        return ErrorResponse.toResponseEntity(ErrorCode.UNAUTHORIZED);
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.warn("IllegalArgumentException: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, e.getMessage()));
     }
 
     /**
-     * 5. 그 외 모든 알 수 없는 예외 (Exception)
-     * 500 Internal Server Error 처리
+     * IllegalStateException 예외 처리 (기존 코드 호환)
+     */
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
+        log.warn("IllegalStateException: {}", e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.of(ErrorCode.DUPLICATE_ATTENDANCE, e.getMessage()));
+    }
+
+    /**
+     * 기타 모든 예외 처리
      */
     @ExceptionHandler(Exception.class)
-    protected ResponseEntity<ErrorResponse> handleException(Exception e) {
-        log.error("handleException: ", e);
-        return ErrorResponse.toResponseEntity(ErrorCode.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        log.error("Unexpected Exception: ", e);
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ErrorResponse.of(ErrorCode.INTERNAL_SERVER_ERROR));
     }
 }
