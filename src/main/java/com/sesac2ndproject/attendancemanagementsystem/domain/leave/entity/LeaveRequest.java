@@ -31,4 +31,11 @@ public class LeaveRequest {
     private LeaveStatus status;     // 대기/승인/반려
     private String adminComment;    // 관리자 코멘트
     private LocalDateTime processedAt;  // 처리일시
+
+    // Team D : 승인 처리 메서드
+    public void approve() {
+        this.status = LeaveStatus.APPROVED; // 상태를 승인으로 변경
+        this.processedAt = LocalDateTime.now(); // 처리 시간 기록
+        this.adminComment = "관리자에 의해 승인되었습니다."; // 관리자 코멘트
+    }
 }

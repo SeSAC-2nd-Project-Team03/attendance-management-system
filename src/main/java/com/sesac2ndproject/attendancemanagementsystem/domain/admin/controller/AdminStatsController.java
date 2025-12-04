@@ -1,5 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.controller;
 
+import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.LeaveRequestResponseDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseAttendanceByDateDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.service.AdminStatsService;
@@ -8,10 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -59,7 +57,12 @@ public class AdminStatsController {
     }
     //    - [ ]  **조퇴/결석 승인 처리 API** (`PATCH /api/v1/admin/leaves/{id}`): 신청 상태를 `APPROVED`로 변경15.
     //        - *(Tip: 승인 시 Team B의 `DailyAttendance` 상태를 업데이트하는 로직을 호출하거나, Team B와 협의 필요)*
-
+    @PatchMapping("/leave/{id}")
+    @Operation(summary = "조퇴/결석 신청 승인", description = "신청 상태를 APPROVED로 변경")
+    public ResponseEntity<LeaveRequestResponseDTO> approveLeaveRequest(@PathVariable Long id) {
+        LeaveRequestResponseDTO result = adminStatsService.requestApprove(id);
+        return ResponseEntity.ok(result);
+    }
     //    - [ ]  **출석 상태 강제 변경 API** (`PUT /api/v1/admin/attendances/{id}`): 시스템 판정과 상관없이 관리자가 상태(예: 지각→출석)를 직접 수정16.
     //    - [ ]  **CSV/Excel 다운로드 API**: 현재 조회된 출석부 데이터를 파일로 변환하여 응답17.
 }

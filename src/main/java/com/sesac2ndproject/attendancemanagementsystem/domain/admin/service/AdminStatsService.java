@@ -83,9 +83,22 @@ public class AdminStatsService {
     private final LeaveRequestRepository leaveRequestRepository;
     @Transactional
     public LeaveRequestResponseDTO requestApprove(Long id) {
-        // id로 해당하는 LeaveRequest 찾아오기
-        Optional<LeaveRequestDTO> foundList = leaveRequestRepository.findById(id);
+        // 1. id로 신청서 찾기 (없으면 예외 발생)
+        LeaveRequest leaveRequest = leaveRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 신청서를 찾을 수 없습니다. id=" + id));
+        // 2. 상태 변경( status -> APPROVED)
+        leaveRequest.approve(); // 엔티티 메서드 사용.
 
+        // 3. 변경된 결과를 DTO로 변환하여 반환.
+        return LeaveRequestResponseDTO.builder()
+                .id(leaveRequest.getId())
+                .memberId(leaveRequest.getMemberId().getId())
+                .memberName(leaveRequest.getMemberId().getName())
+                .targetDate(leaveRequest.getTarget_date())
+                .type(leaveRequest.getType())
+                .status(leaveRequest.getStatus())
+                .reason(leaveRequest.getReason())
+                .build();
     }
 
     //    - [ ]  **출석 상태 강제 변경 API** (`PUT /api/v1/admin/attendances/{id}`): 시스템 판정과 상관없이 관리자가 상태(예: 지각→출석)를 직접 수정16.
