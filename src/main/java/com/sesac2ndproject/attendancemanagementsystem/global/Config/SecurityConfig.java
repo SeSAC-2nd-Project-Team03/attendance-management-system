@@ -57,6 +57,10 @@ public class SecurityConfig {
                         // 3. 인증 관련 (로그인 등) -> 누구나 가능
                         .requestMatchers("/api/v1/auth/**").permitAll()
 
+                        // 4. 출석 관련 API -> 테스트용으로 누구나 가능 (추후 인증 필요 시 수정)
+                        .requestMatchers("/api/v1/attendances/**").permitAll()
+                        .requestMatchers("/api/attendance/**").permitAll()
+
                         // 나머지는 무조건 인증 필요
                         .anyRequest().authenticated()
                 )
