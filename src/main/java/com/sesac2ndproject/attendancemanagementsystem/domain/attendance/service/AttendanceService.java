@@ -8,6 +8,11 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.D
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.AttendanceConfigRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DetailedAttendanceRepository;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.exception.AttendanceConfigNotFoundException;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.exception.AttendanceTimeExpiredException;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.exception.DuplicateAttendanceException;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.exception.InvalidAuthNumberException;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.exception.AttendanceException;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +33,8 @@ import java.util.List;
  * - 시간 기반 자동 타입 판단 (MORNING, LUNCH, DINNER)
  * - 출석/지각 자동 상태 판단
  * - DailyAttendance 시간대별 상태 관리
+ * - 커스텀 예외 처리
+ * - IP 검증 (껍데기)
  */
 @Slf4j
 @Service
@@ -71,19 +78,22 @@ public class AttendanceService {
             // 4. 시간 검증
             validateTime(currentTime, config);
 
-            // 5. 출석 상태 판단 (출석/지각)
+            // 5. IP 검증 (껍데기 - 일단 true 반환)
+            validateIpAddress(connectionIp);
+
+            // 6. 출석 상태 판단 (출석/지각)
             AttendanceStatus attendanceStatus = determineStatus(type, currentTime, config);
             log.info("📌 출석 상태 판단: {}", attendanceStatus);
 
-            // 6. 성공 기록 저장
+            // 7. 성공 기록 저장
             DetailedAttendance successRecord = saveSuccessRecord(
                     memberId, courseId, type, inputNumber, now, connectionIp
             );
 
-            // 7. DailyAttendance 업데이트 (시간대별 상태)
+            // 8. DailyAttendance 업데이트 (시간대별 상태)
             updateDailyAttendance(memberId, courseId, today, type, attendanceStatus);
 
-            // 8. 이벤트 발행
+            // 9. 이벤트 발행
             publishAttendanceEvent(successRecord, today);
 
             log.info("✅ 출석 체크 성공 - detailedAttendanceId: {}, memberId: {}, status: {}",
@@ -95,7 +105,20 @@ public class AttendanceService {
 
             return AttendanceCheckResponse.success(statusMessage, now);
 
+        } catch (AttendanceException e) {
+            // 커스텀 예외 처리
+            log.warn("❌ 출석 체크 실패 - memberId: {}, reason: {}", memberId, e.getMessage());
+
+            DetailedAttendance failureRecord = saveFailureRecord(
+                    memberId, courseId, type, inputNumber, now, connectionIp, e.getMessage()
+            );
+
+            publishAttendanceEvent(failureRecord, today);
+
+            return AttendanceCheckResponse.failure(e.getMessage(), now);
+
         } catch (IllegalArgumentException | IllegalStateException e) {
+            // 기존 예외 호환 (레거시)
             log.warn("❌ 출석 체크 실패 - memberId: {}, reason: {}", memberId, e.getMessage());
 
             DetailedAttendance failureRecord = saveFailureRecord(
@@ -262,9 +285,7 @@ public class AttendanceService {
             AttendanceType type
     ) {
         return configRepository.findByCourseIdAndTargetDateAndType(courseId, targetDate, type)
-                .orElseThrow(() -> new IllegalArgumentException(
-                        String.format("오늘 %s 출석 설정이 존재하지 않습니다.", type)
-                ));
+                .orElseThrow(() -> new AttendanceConfigNotFoundException(type));
     }
 
     /**
@@ -288,9 +309,7 @@ public class AttendanceService {
         );
 
         if (alreadyChecked) {
-            throw new IllegalStateException(
-                    String.format("이미 %s 출석을 완료하셨습니다.", type)
-            );
+            throw new DuplicateAttendanceException(type);
         }
     }
 
@@ -299,11 +318,11 @@ public class AttendanceService {
      */
     private void validateAuthNumber(String inputNumber, String correctNumber) {
         if (inputNumber == null || inputNumber.trim().isEmpty()) {
-            throw new IllegalArgumentException("인증번호를 입력해주세요.");
+            throw new InvalidAuthNumberException("인증번호를 입력해주세요.");
         }
 
         if (!inputNumber.equals(correctNumber)) {
-            throw new IllegalArgumentException("인증번호가 올바르지 않습니다.");
+            throw new InvalidAuthNumberException();
         }
     }
 
@@ -315,18 +334,39 @@ public class AttendanceService {
         LocalTime endTime = config.getDeadline();
 
         if (currentTime.isBefore(startTime)) {
-            throw new IllegalArgumentException(
-                    String.format("출석 가능 시간이 아닙니다. (출석 가능: %s ~ %s)",
-                            startTime, endTime)
-            );
+            throw new AttendanceTimeExpiredException(startTime, endTime);
         }
 
         if (currentTime.isAfter(endTime)) {
-            throw new IllegalArgumentException(
-                    String.format("출석 가능 시간이 아닙니다. (출석 가능: %s ~ %s)",
-                            startTime, endTime)
-            );
+            throw new AttendanceTimeExpiredException(startTime, endTime);
         }
+    }
+
+    /**
+     * IP 주소 검증 (껍데기 - 추후 구현 예정)
+     * 현재는 항상 true를 반환합니다.
+     * 
+     * TODO: 실제 IP 검증 로직 구현
+     * - 허용된 IP 목록과 비교
+     * - VPN/프록시 감지
+     * - 지역 기반 검증 등
+     * 
+     * @param connectionIp 접속 IP 주소
+     * @return 항상 true (추후 구현 시 false 반환 가능)
+     */
+    private boolean validateIpAddress(String connectionIp) {
+        log.info("📌 IP 검증 시작 - IP: {}", connectionIp);
+        
+        // TODO: 실제 IP 검증 로직 구현
+        // 예시:
+        // List<String> allowedIps = ipConfigRepository.findAllowedIps();
+        // if (!allowedIps.contains(connectionIp)) {
+        //     throw new InvalidIpAddressException(connectionIp);
+        // }
+        
+        // 현재는 껍데기로 항상 true 반환
+        log.info("📌 IP 검증 완료 - IP: {} (검증 통과)", connectionIp);
+        return true;
     }
 
     /**
