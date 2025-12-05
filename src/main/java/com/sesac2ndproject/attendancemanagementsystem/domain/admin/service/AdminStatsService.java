@@ -8,12 +8,15 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.E
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.repository.LeaveRequestRepository;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
+import com.sesac2ndproject.attendancemanagementsystem.global.util.CsvUtil;
+import com.sesac2ndproject.attendancemanagementsystem.global.util.ExcelUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -125,5 +128,32 @@ public class AdminStatsService {
 
     }
 
-    //    - [ ]  **CSV/Excel 다운로드 API**: 현재 조회된 출석부 데이터를 파일로 변환하여 응답17.
+    //    - [ ]  **CSV/Excel 다운로드 API**: 현재 조회된 출석부 데이터를 파일로 변환하여 응답.
+    // 파일 다운로드 로직
+    public byte[] downloadAttendanceStats(String type, LocalDate date, Long courseId) {
+        List<ResponseByDateAndCourseIdDTO> dataList;
+
+        // 1. 데이터 조회 분기 처리
+        if(date == null && courseId == null) {
+            // date와 courseId의 입력이 없으면 -> 전체 조회
+            dataList = enrollmentRepository.findAllIntegratedAttendance();
+        } else if (date != null && courseId != null) {
+            // date와 courseId의 입력이 있으면 -> 전체 조회
+            dataList = enrollmentRepository.integratedAttendance(date, courseId);
+        } else {
+            // 둘 중 하나만 들어온 경우 예외 처리
+            throw new IllegalArgumentException("날짜와 과정 ID는 둘 다 입력하거나, 둘 다 없어야 합니다.");
+        }
+
+        // 2. 파일 생성 (CSV or Excel)
+        try{
+            if ("excel".equalsIgnoreCase(type)) {
+                return ExcelUtil.createExcelFile(dataList);
+            } else {
+                return CsvUtil.createCsvFile(dataList);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("파일 생성 중 오류가 발생했습니다.", e);
+        }
+    }
 }

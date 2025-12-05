@@ -1,5 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity;
 
+import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveStatus;
+import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveType;
 import jakarta.persistence.*;
 import lombok.*;
 

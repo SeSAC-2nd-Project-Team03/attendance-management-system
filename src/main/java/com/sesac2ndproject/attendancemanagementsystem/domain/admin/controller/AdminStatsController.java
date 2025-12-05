@@ -7,15 +7,19 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseB
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.service.AdminStatsService;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
+@Tag(name = "Admin", description = "수강생목록, 출석부 조회 / 수정 / 조회한 목록 다운로드")
 @RestController
 @RequestMapping("/api/v1/admin")
 @RequiredArgsConstructor
@@ -70,5 +74,24 @@ public class AdminStatsController {
         DailyAttendanceResponseDTO result = adminStatsService.statusPresenceChange(id);
         return ResponseEntity.ok(result);
     }
-    //    - [ ]  **CSV/Excel 다운로드 API**: 현재 조회된 출석부 데이터를 파일로 변환하여 응답17.
+    //    - [ ]  **CSV/Excel 다운로드 API**: 현재 조회된 출석부 데이터를 파일로 변환하여 응답.
+    @GetMapping("/download")
+    @Operation(summary = "출석부 다운로드", description = "출석부를 다운 받을 수 있습니다.\n[필수 입력]\ntype(csv/excel)\n[선택 입력]\ndate & courseId (미입력시 전체 다운로드)")
+    public ResponseEntity<ByteArrayResource> downloadAttendance(@RequestParam String downloadType,
+                                                                @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate workDate,
+                                                                @RequestParam(required = false) Long courseId) {
+        // 1. downloadType에 따른 파일 데이터 생성
+        byte[] fileData = adminStatsService.downloadAttendanceStats(downloadType, workDate, courseId);
+
+        // 2. 파일명 및 헤더 설정
+        String fileName = "attendance_stats_" + LocalDate.now() + ("excel".equals(downloadType) ? ".xlsx" : ".csv");
+        MediaType mediaType = "excel".equals(downloadType)
+                ? MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                : MediaType.parseMediaType("text/csv");
+        // 3. 파일 응답 반환
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                .contentType(mediaType)
+                .body(new ByteArrayResource(fileData));
+    }
 }

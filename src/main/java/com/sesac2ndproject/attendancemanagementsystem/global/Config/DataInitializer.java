@@ -1,8 +1,10 @@
 package com.sesac2ndproject.attendancemanagementsystem.global.Config;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.AttendanceConfig;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.AttendanceConfigRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DetailedAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Course;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
@@ -10,6 +12,7 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.C
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.repository.MemberRepository;
+import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.RoleType;
@@ -21,6 +24,8 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Component
@@ -33,6 +38,7 @@ public class DataInitializer implements CommandLineRunner {
     private final EnrollmentRepository enrollmentRepository;
     private final DetailedAttendanceRepository detailedAttendanceRepository;
     private final AttendanceConfigRepository attendanceConfigRepository;
+    private final DailyAttendanceRepository dailyAttendanceRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -79,6 +85,29 @@ public class DataInitializer implements CommandLineRunner {
             enrollmentRepository.save(createEnrollment(s2, javaCourse));
             enrollmentRepository.save(createEnrollment(s3, javaCourse));
             System.out.println("수강신청 데이터 초기화 완료");
+        }
+
+        // 5. 과거 데이터 대량 생성 (어제부터 5일 전까지)
+        // 목표: 10개 이상의 DailyAttendance 데이터 만들기
+        // =====================================================================
+        if (dailyAttendanceRepository.count() < 5) { // 데이터가 너무 적으면 실행
+            System.out.println("🔄 [테스트용] 과거 5일치 출석 데이터 생성 시작...");
+            Member s1 = memberRepository.findByLoginId("student1").orElseThrow();
+            Member s2 = memberRepository.findByLoginId("student2").orElseThrow();
+            Member s3 = memberRepository.findByLoginId("student3").orElseThrow();
+
+            List<Member> students = Arrays.asList(s1, s2, s3);
+            LocalDate yesterday = LocalDate.now().minusDays(1);
+
+            // 어제부터 과거 5일간 반복 (총 3명 * 5일 = 15개 Daily 데이터 생성)
+            for (int i = 0; i < 5; i++) {
+                LocalDate targetDate = yesterday.minusDays(i);
+
+                for (Member student : students) {
+                    createPastData(student, javaCourse, targetDate);
+                }
+            }
+            System.out.println("✅ [테스트용] 과거 데이터 생성 완료 (Daily 15개 추가됨)");
         }
 
         // ============================================
@@ -264,6 +293,64 @@ public class DataInitializer implements CommandLineRunner {
 
             System.out.println("🟠 [student3] 조퇴: 아침(O) + 점심(O) + 저녁(X) → LEAVE");
         }
+    }
+    /* [ 헬퍼 메서드 ] */
+    private void createPastData(Member student, Course course, LocalDate date) {
+        // 학생별/날짜별 랜덤 시나리오
+        AttendanceStatus status;
+        boolean forceLate = false;
+        boolean forceAbsent = false;
+
+        if (student.getLoginId().equals("student1")) {
+            status = AttendanceStatus.PRESENT; // 김철수: 개근
+        } else if (student.getLoginId().equals("student2")) {
+            // 이영희: 짝수 날짜 지각
+            forceLate = (date.getDayOfMonth() % 2 == 0);
+            status = forceLate ? AttendanceStatus.LATE : AttendanceStatus.PRESENT;
+        } else {
+            // 박조퇴: 3의 배수 날짜 결석
+            forceAbsent = (date.getDayOfMonth() % 3 == 0);
+            status = forceAbsent ? AttendanceStatus.ABSENT : AttendanceStatus.PRESENT;
+        }
+
+        // 1. DailyAttendance 저장 (ID 생성을 위해 먼저 저장)
+        DailyAttendance daily = DailyAttendance.builder()
+                .memberId(student.getId())
+                .courseId(course.getId())
+                .date(date)
+                .status(status)
+                .morningStatus(forceAbsent ? AttendanceStatus.ABSENT : (forceLate ? AttendanceStatus.LATE : AttendanceStatus.PRESENT))
+                .lunchStatus(forceAbsent ? AttendanceStatus.ABSENT : AttendanceStatus.PRESENT)
+                .dinnerStatus(forceAbsent ? AttendanceStatus.ABSENT : AttendanceStatus.PRESENT)
+                .build();
+
+        DailyAttendance savedDaily = dailyAttendanceRepository.save(daily);
+
+        // 2. DetailedAttendance 저장 (Daily ID 연결)
+        if (!forceAbsent) {
+            // 아침 (지각이면 09:30, 아니면 08:50)
+            createDetail(student, course, savedDaily.getId(), AttendanceType.MORNING, date,
+                    forceLate ? LocalTime.of(9, 30) : LocalTime.of(8, 50), !forceLate);
+            // 점심 (13:10)
+            createDetail(student, course, savedDaily.getId(), AttendanceType.LUNCH, date,
+                    LocalTime.of(13, 10), true);
+            // 저녁 (18:00)
+            createDetail(student, course, savedDaily.getId(), AttendanceType.DINNER, date,
+                    LocalTime.of(18, 0), true);
+        }
+    }
+    private void createDetail(Member m, Course c, Long dailyId, AttendanceType type, LocalDate date, LocalTime time, boolean verified) {
+        detailedAttendanceRepository.save(DetailedAttendance.builder()
+                .memberId(m.getId())
+                .courseId(c.getId())
+                .dailyAttendanceId(dailyId) // ✅ 연결!
+                .type(type)
+                .inputNumber("1234")
+                .checkTime(LocalDateTime.of(date, time))
+                .connectionIp("127.0.0.1")
+                .isVerified(verified)
+                .failReason(verified ? null : "지각 또는 인증 실패")
+                .build());
     }
 
     // 학생 생성 헬퍼 메서드

@@ -27,24 +27,31 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     List<ResponseByDateAndCourseIdDTO> integratedAttendance(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
 
     // Team D 쿼리 3 :
-//    @Query("SELECT da, mem.name, cor.id, cor.courseName, enr.status" +
-//            " FROM DailyAttendance da" +
-//            " JOIN Member mem ON da.memberId= mem.id" +
-//            " JOIN Enrollment enr ON da.memberId = enr.member.id" +
-//            " JOIN Course cor ON enr.id = cor.id" +
-//            " WHERE da.date = :date AND :date >= cor.startDate AND :date <= cor.endDate")
-//    List<ResponseAttendanceByDateDTO> attendanceListByDate(@Param("date") LocalDate date);
     @Query("SELECT new com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseAttendanceByDateDTO$FlatResponse(" +
             "da.id, da.memberId, er.course.id, da.date, da.status, dea) " +
-            " FROM DailyAttendance da" +
+            " FROM DailyAttendance AS da" +
             // Daily(Long) <=> Enrollment(Member객체) 연결: er.member.memberId 사용
-            " JOIN Enrollment er ON da.memberId = er.member.id" +
+            " JOIN Enrollment AS er ON da.memberId = er.member.id" +
             // Daily <=> Detailed 연결: attendanceId 사용 (LEFT JOIN 권장: 상세기록 없어도 출석부는 나오게)
-            " LEFT JOIN DetailedAttendance dea ON da.id = dea.dailyAttendanceId" +
+            " LEFT JOIN DetailedAttendance AS dea ON da.id = dea.dailyAttendanceId" +
             // Enrollment(Course객체) <=> 파라미터(Long) 비교: er.course.courseId 사용
             " WHERE da.date = :workDate AND er.course.id = :courseId")
     List<ResponseAttendanceByDateDTO.FlatResponse> findIntegratedAttendanceFlat(@Param("workDate") LocalDate workDate, @Param("courseId") Long courseId);
 
+    // Team D 쿼리 4 : CSV, Excel 파일 변환을 위한 조건 없는 전체 통합 출석부 조회(WHERE절 없음, 날짜 최신순으로 정렬됨)
+    @Query("SELECT new com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO(" +
+            "   da.id, " +
+            "   da.memberId, " +
+            "   enr.course.id, " +
+            "   da.date, " +
+            "   da.status, " +
+            "   dea" +
+            ") " +
+            " FROM DailyAttendance da" +
+            " JOIN Enrollment enr ON da.memberId = enr.member.id" +
+            " LEFT JOIN DetailedAttendance dea ON da.id = dea.dailyAttendanceId" +
+            " ORDER BY da.date DESC, da.memberId ASC")
+    List<ResponseByDateAndCourseIdDTO> findAllIntegratedAttendance();
 
     @Query("SELECT e.member.id FROM Enrollment e WHERE e.course.id = :courseId AND e.status = :status")
     List<Long> findMemberIdsByCourseIdAndStatus(
