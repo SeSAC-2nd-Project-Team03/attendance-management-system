@@ -1,23 +1,90 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.service;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Map;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.UUID;
 
-public interface FileService {
+@Service
+public class FileService {
+
+    @Value("${file.upload.path:uploads/leave-files}")
+    private String uploadPath;
+
+    @Value("${file.upload.url:http://localhost:9090/api/v1/files}")
+    private String uploadUrl;
 
     /**
-     * 파일을 저장하고 접근 가능한 URL 반환
+     * 파일 업로드 및 접근 가능한 URL 반환
      */
-    Map<String, Object> saveFile(MultipartFile file);
+    public String upload(MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("파일이 비어있습니다.");
+        }
+
+        // 1. 파일 저장 디렉토리 생성
+        Path uploadDir = Paths.get(uploadPath);
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir);
+        }
+
+        // 2. 고유한 파일명 생성
+        String originalFileName = file.getOriginalFilename();
+        String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+        Path filePath = uploadDir.resolve(uniqueFileName);
+
+        // 3. 파일 저장
+        Files.write(filePath, file.getBytes());
+
+        // 4. 접근 가능한 URL 반환
+        return uploadUrl + "/" + uniqueFileName;
+    }
 
     /**
-     * 저장된 파일 삭제
+     * 파일 삭제
      */
-    void deleteFile(String storedFileName);
+    public void delete(String fileUrl) {
+        try {
+            // URL에서 파일명만 추출
+            String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+            Path filePath = Paths.get(uploadPath).resolve(fileName);
+
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+            }
+        } catch (IOException e) {
+            System.err.println("파일 삭제 실패: " + e.getMessage());
+        }
+    }
 
     /**
      * 파일 존재 여부 확인
      */
-    boolean fileExists(String storedFileName);
+    public boolean fileExists(String fileUrl) {
+        try {
+            String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+            Path filePath = Paths.get(uploadPath).resolve(fileName);
+            return Files.exists(filePath);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    /**
+     * 파일 크기 확인 (바이트 단위)
+     */
+    public long getFileSize(String fileUrl) {
+        try {
+            String fileName = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+            Path filePath = Paths.get(uploadPath).resolve(fileName);
+            return Files.size(filePath);
+        } catch (IOException e) {
+            return -1;
+        }
+    }
 }

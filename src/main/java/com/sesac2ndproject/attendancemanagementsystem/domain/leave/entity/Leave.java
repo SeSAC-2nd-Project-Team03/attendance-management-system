@@ -59,7 +59,7 @@ public class Leave {
     @Column
     private LocalDateTime updatedAt;
 
-    // 삭제 여부 (소프트 델리트)
+    // 삭제 여부
     @Column(nullable = false)
     private Boolean isDeleted;
 
