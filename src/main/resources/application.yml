@@ -61,3 +61,7 @@ file:
     upload:
       path: C:/uploads/leave-files  # 최종 저장 경로 # 프로젝트 루트 폴더에 'uploads' 폴더 생성 후 저장
       url: http://localhost:9090/api/v1/files
+    file:
+      upload:
+        path: uploads/leave-files
+        url: http://localhost:9090/api/v1/files
