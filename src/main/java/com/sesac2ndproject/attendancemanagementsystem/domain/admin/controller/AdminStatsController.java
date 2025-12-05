@@ -64,7 +64,7 @@ public class AdminStatsController {
         return ResponseEntity.ok(result);
     }
     //    - [ ]  **출석 상태 강제 변경 API** (`PUT /api/v1/admin/attendances/{id}`): 시스템 판정과 상관없이 관리자가 상태(예: 지각→출석)를 직접 수정.
-    @PutMapping("attendances/{id}")
+    @PatchMapping("attendances/{id}")
     @Operation(summary = "출석 상태 변경(출석)", description = "시스템 판정과 상관없이 관리자가 상태(예: 지각→출석)를 직접 수정.")
     public ResponseEntity<DailyAttendanceResponseDTO> changeDailyAttendancePresentStatus(@PathVariable Long id) {
         DailyAttendanceResponseDTO result = adminStatsService.statusPresenceChange(id);
