@@ -3,6 +3,7 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity;
 import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;
+import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -116,5 +117,9 @@ public class DailyAttendance extends BaseTimeEntity {
         } else {
             this.status = AttendanceStatus.PRESENT;
         }
+    }
+    // 출석 상태를 PRESENT로 변경
+    public void changeStatusPresent() {
+        this.status = AttendanceStatus.PRESENT;
     }
 }

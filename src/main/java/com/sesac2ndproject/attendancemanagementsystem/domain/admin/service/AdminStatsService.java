@@ -1,6 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.service;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.*;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
@@ -102,7 +103,27 @@ public class AdminStatsService {
     }
 
     //    - [ ]  **출석 상태 강제 변경 API** (`PUT /api/v1/admin/attendances/{id}`): 시스템 판정과 상관없이 관리자가 상태(예: 지각→출석)를 직접 수정16.
+    @Transactional
+    public DailyAttendanceResponseDTO statusPresenceChange (Long id) {
+        // 1. DailyAttendance에서 id에 해당하는 value 찾아오기
+        Optional<DailyAttendance> dailyAttendanceOptional = dailyAttendanceRepository.findById(id);
+        DailyAttendance dailyAttendance = dailyAttendanceOptional
+                .orElseThrow(() -> new IllegalArgumentException("해당 출석부를 찾을 수 없습니다."));
+        // 2. 상태 변경(AttendanceStatus -> PRESENT)
+        dailyAttendance.changeStatusPresent();
+        // 3. 변경된 결과를 DTO로 변환하여 반환.
+        return DailyAttendanceResponseDTO.builder()
+                .id(dailyAttendance.getId())
+                .memberId(dailyAttendance.getMemberId())
+                .courseId(dailyAttendance.getCourseId())
+                .date(dailyAttendance.getDate())
+                .morningStatus(dailyAttendance.getMorningStatus())
+                .lunchStatus(dailyAttendance.getLunchStatus())
+                .dinnerStatus(dailyAttendance.getDinnerStatus())
+                .status(dailyAttendance.getStatus())
+                .build();
 
+    }
 
     //    - [ ]  **CSV/Excel 다운로드 API**: 현재 조회된 출석부 데이터를 파일로 변환하여 응답17.
 }
