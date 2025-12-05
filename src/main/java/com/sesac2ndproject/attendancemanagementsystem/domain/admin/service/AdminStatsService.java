@@ -4,6 +4,8 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.*;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveRequest;
+import com.sesac2ndproject.attendancemanagementsystem.domain.leave.repository.LeaveRequestRepository;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -81,6 +80,29 @@ public class AdminStatsService {
 
     //    - [ ]  **조퇴/결석 승인 처리 API** (`PATCH /api/v1/admin/leaves/{id}`): 신청 상태를 `APPROVED`로 변경15.
     //        - *(Tip: 승인 시 Team B의 `DailyAttendance` 상태를 업데이트하는 로직을 호출하거나, Team B와 협의 필요)*
+    private final LeaveRequestRepository leaveRequestRepository;
+    @Transactional
+    public LeaveRequestResponseDTO requestApprove(Long id) {
+        // 1. id로 신청서 찾기 (없으면 예외 발생)
+        LeaveRequest leaveRequest = leaveRequestRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 신청서를 찾을 수 없습니다. id=" + id));
+        // 2. 상태 변경( status -> APPROVED)
+        leaveRequest.approve(); // 엔티티 메서드 사용.
+
+        // 3. 변경된 결과를 DTO로 변환하여 반환.
+        return LeaveRequestResponseDTO.builder()
+                .id(leaveRequest.getId())
+                .memberId(leaveRequest.getMemberId().getId())
+                .memberName(leaveRequest.getMemberId().getName())
+                .targetDate(leaveRequest.getTarget_date())
+                .type(leaveRequest.getType())
+                .status(leaveRequest.getStatus())
+                .reason(leaveRequest.getReason())
+                .build();
+    }
+
     //    - [ ]  **출석 상태 강제 변경 API** (`PUT /api/v1/admin/attendances/{id}`): 시스템 판정과 상관없이 관리자가 상태(예: 지각→출석)를 직접 수정16.
+
+
     //    - [ ]  **CSV/Excel 다운로드 API**: 현재 조회된 출석부 데이터를 파일로 변환하여 응답17.
 }

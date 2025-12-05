@@ -3,6 +3,8 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.auth.service;
 import com.sesac2ndproject.attendancemanagementsystem.domain.auth.dto.LoginRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.repository.MemberRepository;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.CustomException;
+import com.sesac2ndproject.attendancemanagementsystem.global.error.ErrorCode;
 import com.sesac2ndproject.attendancemanagementsystem.global.jwt.JwtTokenProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -23,11 +25,11 @@ public class AuthService {
     public String login(LoginRequest request) {
         // 아이디로 회원 찾기
         Member member = memberRepository.findByLoginId(request.getLoginId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 아이디입니다"));
+                .orElseThrow(() -> new CustomException(ErrorCode.MEMBER_NOT_FOUND));
 
         // 비밀번호 확인
         if(!(passwordEncoder.matches(request.getPassword(), member.getPassword()))) {
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
 
         // 인증 성공 시 토큰 생성

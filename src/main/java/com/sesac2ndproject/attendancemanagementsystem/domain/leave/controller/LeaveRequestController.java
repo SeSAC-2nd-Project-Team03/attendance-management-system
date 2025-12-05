@@ -1,11 +1,11 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.controller;
 
+import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveType;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto.LeaveRequestCreateDto;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto.LeaveRequestResponseDto;
-import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveType;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.service.LeaveRequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;

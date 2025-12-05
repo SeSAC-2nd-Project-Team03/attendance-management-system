@@ -1,8 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveRequest;
-import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveStatus;
-import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveType;
 import lombok.*;
 import java.time.LocalDateTime;
 
