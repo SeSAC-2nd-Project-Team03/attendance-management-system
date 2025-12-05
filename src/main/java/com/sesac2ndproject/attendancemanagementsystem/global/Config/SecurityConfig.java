@@ -38,14 +38,8 @@ public class SecurityConfig {
 
                 // url별 권한 관리
                 .authorizeHttpRequests(auth -> auth
-                        // Swagger 관련 주소는 누구나 접속 가능 (permitAll)
-                        .requestMatchers(
-                                "/v3/api-docs/**",
-                                "/swagger-ui/**",
-                                "/swagger-ui.html"
-                        ).permitAll()
-
-                        // H2 DB 콘솔도 누구나 접속 가능
+                        .requestMatchers("/api/v1/files/**").permitAll()
+                        .requestMatchers("/api/v1/leave-requests/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
 
                         // 1. 관리자 전용 경로 (/api/v1/admin/**) -> ADMIN 권한만 가능

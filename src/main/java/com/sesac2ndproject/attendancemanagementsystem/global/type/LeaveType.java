@@ -11,4 +11,5 @@ public enum LeaveType {
     SICK_LEAVE("병가");
 
     private final String description;
+
 }
