@@ -47,13 +47,18 @@ public class AttendanceConfig extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalTime standardTime; // 기준 시간 (예: 09:00, 12:30)
 
+    // ✅ 추가된 필드: 마감 시간
+    @Column(nullable = false)
+    private LocalTime deadlineTime; // 마감 시간 (예: 09:10, 12:40)
+
     // 생성자 (관리자가 설정을 생성할 때 사용)
-    public AttendanceConfig(Long courseId, Long adminId, AttendanceType type, String authNumber, LocalDate targetDate, LocalTime standardTime) {
+    public AttendanceConfig(Long courseId, Long adminId, AttendanceType type, String authNumber, LocalDate targetDate, LocalTime standardTime, LocalTime deadlineTime) {
         this.courseId = courseId;
         this.adminId = adminId;
         this.type = type;
         this.authNumber = authNumber;
         this.targetDate = targetDate;
         this.standardTime = standardTime;
+        this.deadlineTime = deadlineTime;
     }
 }
