@@ -41,6 +41,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/v1/files/**").permitAll()
                         .requestMatchers("/api/v1/leave-requests/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 절대절대절대절대절대로 지우지 마세요!
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html"
+                        ).permitAll()
 
                         // 1. 관리자 전용 경로 (/api/v1/admin/**) -> ADMIN 권한만 가능
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
@@ -54,6 +60,7 @@ public class SecurityConfig {
                         // 4. 출석 관련 API -> 테스트용으로 누구나 가능 (추후 인증 필요 시 수정)
                         .requestMatchers("/api/v1/attendances/**").permitAll()
                         .requestMatchers("/api/attendance/**").permitAll()
+                        .requestMatchers("/api/v1/**").permitAll()
 
                         // 나머지는 무조건 인증 필요
                         .anyRequest().authenticated()
