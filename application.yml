@@ -1,0 +1,62 @@
+server:
+  port: 9090
+
+spring:
+  # ----------------------------------------
+  # 🗄️ [공통] MySQL 데이터베이스 설정
+  # ----------------------------------------
+  datasource:
+    # MySQL 연결 설정 (로컬 MySQL 서버 사용)
+    url: jdbc:mysql://localhost:3306/attendance_db?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root      # MySQL 사용자명 (본인의 MySQL 사용자명으로 변경)
+    password: root      # MySQL 비밀번호 (본인의 MySQL 비밀번호로 변경)
+
+  # H2 데이터베이스 설정 (주석 처리 - MySQL 사용 시 불필요)
+  # datasource:
+  #   url: jdbc:h2:file:./data/attendance_db;MODE=MySQL;AUTO_SERVER=TRUE
+  #   driver-class-name: org.h2.Driver
+  #   username: sa
+  #   password:
+  # h2:
+  #   console:
+  #     enabled: true
+  #     path: /h2-console
+
+  # ----------------------------------------
+  # 🏗️ [공통] JPA (ORM) 설정
+  # ----------------------------------------
+  jpa:
+    defer-datasource-initialization: true
+    database-platform: org.hibernate.dialect.MySQLDialect  # MySQL 방언 사용
+    hibernate:
+      ddl-auto: update  # 서버 켤 때 테이블 자동 생성/변경 (create-drop은 켤때마다 날아감)
+    properties:
+      hibernate:
+        format_sql: true # 로그에 SQL 예쁘게 출력
+        show_sql: true   # 실행되는 SQL을 콘솔에 보여줌
+
+
+
+  # ----------------------------------------
+  # 📂 [Team C] 파일 업로드 제한 설정
+  # ----------------------------------------
+  servlet:
+    multipart:
+      max-file-size: 10MB      # 파일 하나당 최대 크기
+      max-request-size: 10MB   # 요청 전체 최대 크기
+
+# ==========================================
+# 🔐 [Team A] JWT 커스텀 설정
+# ==========================================
+jwt:
+  # HS512 알고리즘을 위해 64바이트(512비트) 이상의 긴 문자열이 필요합니다.
+  # 개발용 임시 키입니다. (배포 시에는 application-secret.yml로 분리 권장)
+  secret: "v3rY-s3cr3t-k3y-f0r-Att3ndanc3-M4nag3m3nt-Sy5t3m-k3y-must-b3-l0ng-3nough"
+  expiration: 3600000 # 1시간 (밀리초 단위: 1000 * 60 * 60)
+
+# ==========================================
+# 📂 [Team C] 파일 저장 경로 커스텀 설정
+# ==========================================
+file:
+  upload-dir: ./uploads  # 프로젝트 루트 폴더에 'uploads' 폴더 생성 후 저장

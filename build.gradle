@@ -41,9 +41,9 @@ dependencies {
     // 🗄️ [DB] 데이터베이스 (All Teams)
     // ==========================================
     // 개발 단계: H2 (메모리 DB - 설치 없이 바로 실행 가능)
-    runtimeOnly 'com.h2database:h2'
+    // runtimeOnly 'com.h2database:h2'
     // 운영 단계: MySQL (실제 배포 시 사용, 필요하면 주석 해제)
-    // runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
     // ==========================================
     // 🔐 [Team A] 인증/보안 (Auth & Member)
@@ -69,7 +69,7 @@ dependencies {
     // ==========================================
     // 엑셀 다운로드를 위한 Apache POI
     implementation 'org.apache.poi:poi:5.2.3'
-    implementation 'org.apache.poi:poi-ooxml:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.4.0'
 
     // ==========================================
     // 📄 [문서화] Swagger/OpenAPI (All Teams)
