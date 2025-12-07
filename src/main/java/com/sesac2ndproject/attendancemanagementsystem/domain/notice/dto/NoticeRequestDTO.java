@@ -1,16 +1,16 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.notice.dto;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class NoticeRequestDTO {
     private String title;       // 공지사항 제목
     private String content;     // 공지사항 내용
-    private Member adminId;     // 작성자 ID(Admin의 id임)
+    private Long adminId;     // 작성자 ID(Admin의 id임)
     private Long viewCount;     // 조회수
     private Boolean isPopup;    // 메인 페이지에 팝업으로 띄울 중요한 공지인지 여부 (페이지에 들어가면 팝업으로 나오고 '오늘 하루 그만보기' 있는 창 같은 것)
     private LocalDateTime popupStartDate;   // 메인 페이지에 팝업으로 띄울 시작 날짜
