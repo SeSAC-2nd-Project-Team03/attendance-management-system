@@ -29,7 +29,7 @@ public class Member extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private RoleType role;
+    private RoleType role;  // 일반 사용자, 관리자
 
 
     public void updatePassword(String encryptedPassword) {

@@ -12,6 +12,8 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.C
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.repository.MemberRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.notice.entity.Notice;
+import com.sesac2ndproject.attendancemanagementsystem.domain.notice.repository.NoticeRepository;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
@@ -39,6 +41,7 @@ public class DataInitializer implements CommandLineRunner {
     private final DetailedAttendanceRepository detailedAttendanceRepository;
     private final AttendanceConfigRepository attendanceConfigRepository;
     private final DailyAttendanceRepository dailyAttendanceRepository;
+    private final NoticeRepository noticeRepository;
 
     @Override
     public void run(String... args) throws Exception {
@@ -293,6 +296,50 @@ public class DataInitializer implements CommandLineRunner {
 
             System.out.println("🟠 [student3] 조퇴: 아침(O) + 점심(O) + 저녁(X) → LEAVE");
         }
+        // 6. 공지사항(notice) 데이터 생성 (총 30개)
+        if (noticeRepository.count() == 0) {
+            System.out.println("🔄 [테스트용] 공지사항 데이터 생성 시작...");
+            Member admin = memberRepository.findByLoginId("admin")
+                    .orElseThrow(() -> new RuntimeException("관리자 계정이 없습니다."));
+            LocalDateTime now = LocalDateTime.now();
+
+            for (int i = 1; i <= 30; i++) {
+                boolean isPopup = false;
+                LocalDateTime startDate = null;
+                LocalDateTime endDate = null;
+                String titlePrefix = "[공지] ";
+
+                // 25번 ~ 30번은 팝업 공지로 설정
+                if (i > 20) {
+                    isPopup = true;
+                    if (i <= 25) {
+                        // 21~25번: [진행중] 오늘 날짜 포함 (어제 ~ 내일) -> 화면에 보여야 함
+                        titlePrefix = "[팝업/중요] ";
+                        startDate = now.minusDays(1);
+                        endDate = now.plusDays(1);
+                    } else {
+                        // 26~30번: [만료됨] 지난 날짜 (지난달 ~ 어제) -> 화면에 안 보여야 함
+                        titlePrefix = "[팝업/만료] ";
+                        startDate = now.minusMonths(1);
+                        endDate = now.minusDays(1);
+                    }
+                }
+
+                Notice notice = Notice.builder()
+                        .title(titlePrefix + "테스트 공지사항 " + i + "입니다.")
+                        .content("안녕하세요. 테스트 공지사항 내용입니다. <br> 번호: " + i + "<br> 화이팅하세요!")
+                        .writer(admin) // 관리자 작성
+                        .viewCount((long) (Math.random() * 10001))
+                        .isPopup(isPopup)
+                        .popupStartDate(startDate)
+                        .popupEndDate(endDate)
+                        .build();
+
+                noticeRepository.save(notice);
+            }
+            System.out.println("✅ [테스트용] 공지사항 30개 생성 완료 (팝업 10개 포함)");
+        }
+
     }
     /* [ 헬퍼 메서드 ] */
     private void createPastData(Member student, Course course, LocalDate date) {

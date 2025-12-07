@@ -57,9 +57,9 @@ public class LeaveRequest extends BaseTimeEntity {
     @Column
     private String processedBy;
 
-    private LocalDate target_date;  // 신청 날짜
-    private LeaveType type;         // 이유 타입 : 조퇴/결석
-    private String adminComment;    // 관리자 코멘트
+    private LocalDate target_date;  // 신청 날짜           /* 상단의 leaveDate 필드와 같은 내용 */
+    private LeaveType type;         // 이유 타입 : 조퇴/결석 /* 상단의 type 필드와 같은 내용 */
+    private String adminComment;    // 관리자 코멘트        /* ?상단의 processedBy와 같은 내용??? */
 
 
     public void cancel() {
