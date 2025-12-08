@@ -2,8 +2,8 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.auth.service;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.auth.dto.AuthRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.auth.dto.AuthResponse;
-import com.sesac2ndproject.attendancemanagementsystem.domain.auth.entity.RefreshToken;
-import com.sesac2ndproject.attendancemanagementsystem.domain.auth.repository.RefreshTokenRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.refreshtoken.entity.RefreshToken;
+import com.sesac2ndproject.attendancemanagementsystem.domain.refreshtoken.repository.RefreshTokenRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.domain.member.repository.MemberRepository;
 import com.sesac2ndproject.attendancemanagementsystem.global.error.CustomException;

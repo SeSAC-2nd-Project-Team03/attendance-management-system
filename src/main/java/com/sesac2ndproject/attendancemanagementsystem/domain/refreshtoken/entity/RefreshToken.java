@@ -1,4 +1,4 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.auth.entity;
+package com.sesac2ndproject.attendancemanagementsystem.domain.refreshtoken.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

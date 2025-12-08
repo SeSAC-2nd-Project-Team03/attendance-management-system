@@ -2,10 +2,10 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.service
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response.AttendanceCheckResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.event.AttendanceLogCreatedEvent;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.AttendanceConfig;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.entity.AttendanceConfig;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.AttendanceConfigRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.repository.AttendanceConfigRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DetailedAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.global.error.exception.AttendanceConfigNotFoundException;

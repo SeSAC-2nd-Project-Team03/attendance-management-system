@@ -1,4 +1,4 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.entity;
 
 import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;
@@ -19,7 +19,7 @@ import java.time.LocalTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder  // ✅ Lombok이 자동으로 builder() 메서드 생성
+@Builder
 @Table(
         name = "attendance_config",
         uniqueConstraints = {
@@ -59,4 +59,27 @@ public class AttendanceConfig extends BaseTimeEntity {
 
     @Column(nullable = false)
     private Integer validMinutes; // 유효 시간 (분 단위, 예: 20분)
+
+    public void updateTimeRule(LocalTime standardTime, Integer validMinutes) {
+        this.standardTime = standardTime;
+        this.validMinutes = validMinutes;
+        this.deadline = standardTime.plusMinutes(validMinutes);
+    }
+
+    public static AttendanceConfig create(Long courseId, AttendanceType type, String authNumber, LocalDate targetDate, LocalTime standardTime, Integer validMinutes) {
+        return AttendanceConfig.builder()
+                .courseId(courseId)
+                .type(type)
+                .authNumber(authNumber)
+                .targetDate(targetDate)
+                .standardTime(standardTime)
+                .validMinutes(validMinutes)
+                .deadline(calculateDeadline(standardTime, validMinutes)) // 생성 시점 계산
+                .build();
+    }
+
+    // 내부 계산 로직 (중복 제거용)
+    private static LocalTime calculateDeadline(LocalTime standard, Integer minutes) {
+        return standard.plusMinutes(minutes);
+    }
 }
