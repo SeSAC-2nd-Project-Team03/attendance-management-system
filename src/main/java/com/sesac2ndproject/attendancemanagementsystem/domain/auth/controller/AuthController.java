@@ -4,6 +4,7 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.auth.controller;
 import com.sesac2ndproject.attendancemanagementsystem.domain.auth.dto.LoginRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.auth.dto.LoginResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.auth.service.AuthService;
+import com.sesac2ndproject.attendancemanagementsystem.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,10 +24,11 @@ public class AuthController {
 
     @Operation(summary = "Login", description = "user에게 id/pw 를 입력받아 JWT 토큰을 발급합니다")
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest request) {
         String token = authService.login(request);
+        ApiResponse<LoginResponse> response = ApiResponse.success(new LoginResponse(token));
 
         // JSON 형태로 반환하기
-        return ResponseEntity.ok(new LoginResponse(token));
+        return ResponseEntity.ok(response);
     }
 }

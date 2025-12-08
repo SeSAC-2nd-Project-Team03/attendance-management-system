@@ -41,9 +41,9 @@ dependencies {
     // 🗄️ [DB] 데이터베이스 (All Teams)
     // ==========================================
     // 개발 단계: H2 (메모리 DB - 설치 없이 바로 실행 가능)
-    // runtimeOnly 'com.h2database:h2'
+     runtimeOnly 'com.h2database:h2'
     // 운영 단계: MySQL (실제 배포 시 사용, 필요하면 주석 해제)
-    runtimeOnly 'com.mysql:mysql-connector-j'
+//    runtimeOnly 'com.mysql:mysql-connector-j'
 
     // ==========================================
     // 🔐 [Team A] 인증/보안 (Auth & Member)
@@ -60,9 +60,6 @@ dependencies {
     // ==========================================
     // 파일 입출력 유틸 (파일명 처리 등에 유용)
     implementation 'commons-io:commons-io:2.14.0'
-
-    // (선택) AWS S3 연동이 필요하다면 아래 의존성 추가
-    // implementation 'io.awspring.cloud:spring-cloud-aws-starter-s3:3.0.1'
 
     // ==========================================
     // 📊 [Team D] 엑셀/관리자 (Admin & Stats)
