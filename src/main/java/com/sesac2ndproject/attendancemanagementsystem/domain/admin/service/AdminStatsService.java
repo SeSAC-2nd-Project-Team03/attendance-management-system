@@ -7,19 +7,14 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrol
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.repository.LeaveRequestRepository;
-import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.util.CsvUtil;
 import com.sesac2ndproject.attendancemanagementsystem.global.util.ExcelUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -63,7 +58,9 @@ public class AdminStatsService {
                 ResponseAttendanceByDateDTO dto = ResponseAttendanceByDateDTO.builder()
                         .dailyAttendanceId(flat.getDailyAttendanceId())
                         .memberId(flat.getMemberId())
+                        .memberName(flat.getMemberName())
                         .courseId(flat.getCourseId())
+                        .courseName(flat.getCourseName())
                         .workDate(flat.getWorkDate())
                         .totalStatus(flat.getTotalStatus())
                         .detailedAttendanceList(new ArrayList<>()) // 리스트 초기화

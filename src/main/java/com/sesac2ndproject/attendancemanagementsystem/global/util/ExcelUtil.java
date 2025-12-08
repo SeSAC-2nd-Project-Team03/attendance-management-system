@@ -24,7 +24,7 @@ public class ExcelUtil {
 
             // 헤더 생성(Row 0)
             Row headerRow = sheet.createRow(0);
-            String[] headers = {"날짜", "학생ID", "최종상태", "상세타입", "입력시간", "IP", "검증여부"};
+            String[] headers = {"날짜", "학생ID", "학생이름", "최종상태", "강좌ID", "강좌이름", "출석타입", "입력시간", "IP", "검증여부"};
             for(int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
@@ -38,23 +38,25 @@ public class ExcelUtil {
 
                 row.createCell(0).setCellValue(dto.getDate().toString());
                 row.createCell(1).setCellValue(dto.getMemberId());
-                row.createCell(2).setCellValue(dto.getStatus().getDescription());
+                row.createCell(2).setCellValue(dto.getMemberName());
+                row.createCell(3).setCellValue(dto.getStatus().getDescription());
+                row.createCell(4).setCellValue(dto.getCourseId());
+                row.createCell(5).setCellValue(dto.getCourseName());
                 // 상세 데이터(detailedAttendance) 존재 여부에 따라 넣을 값 결정
                 if(dto.getDetailedAttendance() != null) {
                     DetailedAttendance detail = dto.getDetailedAttendance();
-                    row.createCell(3).setCellValue(detail.getType().toString());
-                    row.createCell(4).setCellValue(detail.getCheckTime().toString());
-                    row.createCell(5).setCellValue(detail.getConnectionIp());
-                    row.createCell(6).setCellValue(detail.isVerified() ? "성공" : "실패");
+                    row.createCell(6).setCellValue(detail.getType().toString());
+                    row.createCell(7).setCellValue(detail.getCheckTime().toString());
+                    row.createCell(8).setCellValue(detail.getConnectionIp());
+                    row.createCell(9).setCellValue(detail.isVerified() ? "성공" : "실패");
                 } else {
                     // 상세 데이터가 없을 경우 빈칸
-                    row.createCell(3).setCellValue("-");
-                    row.createCell(4).setCellValue("-");
-                    row.createCell(5).setCellValue("-");
                     row.createCell(6).setCellValue("-");
+                    row.createCell(7).setCellValue("-");
+                    row.createCell(8).setCellValue("-");
+                    row.createCell(9).setCellValue("-");
                 }
             }
-
             workbook.write(baout);
             return baout.toByteArray();
         }

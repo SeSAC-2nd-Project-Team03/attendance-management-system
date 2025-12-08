@@ -35,7 +35,9 @@ public class ResponseAttendanceByDateDTO {
     // [최종 결과] 화면에 보여줄 완성된 형태
     private Long dailyAttendanceId;
     private Long memberId;
+    private String memberName;
     private Long courseId;
+    private String courseName;
     private LocalDate workDate;
     private AttendanceStatus totalStatus;
 
@@ -58,7 +60,9 @@ public class ResponseAttendanceByDateDTO {
     public static class FlatResponse {
         private Long dailyAttendanceId;
         private Long memberId;
+        private String memberName;
         private Long courseId;
+        private String courseName;
         private LocalDate workDate;
         private AttendanceStatus totalStatus;
 
