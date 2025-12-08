@@ -1,6 +1,5 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.service;
+package com.sesac2ndproject.attendancemanagementsystem.global.type;
 
-import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

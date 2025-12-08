@@ -1,4 +1,4 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.request;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

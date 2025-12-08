@@ -1,11 +1,11 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.controller;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.controller;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.request.AttendanceAutoCheckRequest;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.dto.AttendanceAutoCheckRequest;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.service.AttendanceCommandService;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.request.AttendanceCheckRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response.AttendanceCheckResponse;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response.MyAttendanceResponse;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.service.AttendanceService;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.service.AttendanceStatusService;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.dto.MyAttendanceResponse;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.service.AttendanceQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,13 +28,13 @@ import java.time.LocalDate;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/v1/attendance/execute")
 @RequiredArgsConstructor
-@Tag(name = "출석 관리", description = "출석 체크 및 조회 API")
-public class AttendanceController {
+@Tag(name = "Attendance (Command)", description = "출석 체크 및 상태 변경 API")
+public class AttendanceCommandController {
 
-    private final AttendanceService attendanceService;
-    private final AttendanceStatusService attendanceStatusService;
+    private final AttendanceCommandService attendanceCommandService;
+    private final AttendanceQueryService attendanceQueryService;
 
     /**
      * 출석 체크 API (타입 직접 지정)
@@ -129,7 +129,7 @@ public class AttendanceController {
         String connectionIp = extractIpAddress(httpRequest);
         log.info("📌 접속 IP: {}", connectionIp);
 
-        AttendanceCheckResponse response = attendanceService.checkAttendance(
+        AttendanceCheckResponse response = attendanceCommandService.checkAttendance(
                 memberId,
                 request.getCourseId(),
                 request.getType(),
@@ -202,7 +202,7 @@ public class AttendanceController {
         String connectionIp = extractIpAddress(httpRequest);
         log.info("📌 접속 IP: {}", connectionIp);
 
-        AttendanceCheckResponse response = attendanceService.checkAttendanceAuto(
+        AttendanceCheckResponse response = attendanceCommandService.checkAttendanceAuto(
                 request.getMemberId(),
                 request.getCourseId(),
                 request.getInputNumber(),
@@ -222,7 +222,7 @@ public class AttendanceController {
             HttpServletRequest httpRequest
     ) {
         String connectionIp = extractIpAddress(httpRequest);
-        AttendanceCheckResponse response = attendanceService.checkAttendance(
+        AttendanceCheckResponse response = attendanceCommandService.checkAttendance(
                 request.getMemberId(),
                 request.getCourseId(),
                 request.getType(),
@@ -260,7 +260,7 @@ public class AttendanceController {
         }
         log.info("GET /api/v1/attendances/me - memberId: {}, courseId: {}, date: {}", memberId, courseId, date);
         
-        MyAttendanceResponse response = attendanceStatusService.getMyAttendance(memberId, courseId, date);
+        MyAttendanceResponse response = attendanceQueryService.getMyAttendance(memberId, courseId, date);
         return ResponseEntity.ok(response);
     }
 

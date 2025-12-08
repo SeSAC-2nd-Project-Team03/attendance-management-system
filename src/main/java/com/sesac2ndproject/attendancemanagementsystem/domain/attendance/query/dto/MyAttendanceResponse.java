@@ -1,6 +1,7 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response.AttendanceDetailResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import lombok.Builder;
