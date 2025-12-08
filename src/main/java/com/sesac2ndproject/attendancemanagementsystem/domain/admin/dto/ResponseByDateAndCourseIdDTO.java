@@ -16,7 +16,9 @@ public class ResponseByDateAndCourseIdDTO {
     // 1. DailyAttendance 관련 정보
     private Long dailyAttendanceId;
     private Long memberId;
+    private String memberName;
     private Long courseId;
+    private String courseName;
     private LocalDate date;
     private AttendanceStatus status;
 

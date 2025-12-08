@@ -13,13 +13,16 @@ public class CsvUtil {
         StringBuilder sb = new StringBuilder();
 
         // Header 작성
-        sb.append("날짜,학생ID,최종상태,상세타입,입력시간,IP,검증여부\n");
+        sb.append("날짜,학생ID,학생이름,최종상태,강좌ID,강좌이름,출석타입,입력시간,IP,검증여부\n");
 
         // Row(데이터) 작성
         for(ResponseByDateAndCourseIdDTO dto : dataList) {
             sb.append(dto.getDate()).append(",");
             sb.append(dto.getMemberId()).append(",");
+            sb.append(dto.getMemberName()).append(",");
             sb.append(dto.getStatus()).append(",");
+            sb.append(dto.getCourseId()).append(",");
+            sb.append(dto.getCourseName()).append(",");
             // 상세 기록이 없는 경우(결석 등) 빈칸 처리
             if(dto.getDetailedAttendance() != null) {
                 DetailedAttendance detail = dto.getDetailedAttendance();
