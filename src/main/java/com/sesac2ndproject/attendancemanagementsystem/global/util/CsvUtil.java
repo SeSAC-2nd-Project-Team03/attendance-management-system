@@ -1,6 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.global.util;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.dto.ResponseAttendanceFlatDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
 
 import java.nio.charset.StandardCharsets;
@@ -9,18 +9,18 @@ import java.util.List;
 public class CsvUtil {
 
     // 1. CSV 파일 생성 (콤마로 구분)
-    public static byte[] createCsvFile(List<ResponseByDateAndCourseIdDTO> dataList) {
+    public static byte[] createCsvFile(List<ResponseAttendanceFlatDTO> dataList) {
         StringBuilder sb = new StringBuilder();
 
         // Header 작성
         sb.append("날짜,학생ID,학생이름,최종상태,강좌ID,강좌이름,출석타입,입력시간,IP,검증여부\n");
 
         // Row(데이터) 작성
-        for(ResponseByDateAndCourseIdDTO dto : dataList) {
-            sb.append(dto.getDate()).append(",");
+        for(ResponseAttendanceFlatDTO dto : dataList) {
+            sb.append(dto.getWorkDate()).append(",");
             sb.append(dto.getMemberId()).append(",");
             sb.append(dto.getMemberName()).append(",");
-            sb.append(dto.getStatus()).append(",");
+            sb.append(dto.getTotalStatus()).append(",");
             sb.append(dto.getCourseId()).append(",");
             sb.append(dto.getCourseName()).append(",");
             // 상세 기록이 없는 경우(결석 등) 빈칸 처리

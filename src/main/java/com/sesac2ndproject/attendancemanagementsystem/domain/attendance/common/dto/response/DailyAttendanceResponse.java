@@ -1,4 +1,4 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.response;
 
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import lombok.*;
@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class DailyAttendanceResponseDTO {
+public class DailyAttendanceResponse {
     private Long id;
     private Long memberId;
     private Long courseId;

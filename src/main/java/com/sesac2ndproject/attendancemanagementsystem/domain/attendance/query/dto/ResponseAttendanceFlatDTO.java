@@ -1,28 +1,25 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.dto;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
 import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-// 통합 출석부 조회:** 날짜 + 과정ID를 받으면 → 해당 수강생들의 `DailyAttendance`와 `DetailedAttendance`를 조인(또는 Fetch)하여 가져오는 DTO.
-public class ResponseByDateAndCourseIdDTO {
-
-    // 1. DailyAttendance 관련 정보
+public class ResponseAttendanceFlatDTO {
     private Long dailyAttendanceId;
     private Long memberId;
     private String memberName;
     private Long courseId;
     private String courseName;
-    private LocalDate date;
-    private AttendanceStatus status;
+    private LocalDate workDate;
+    private AttendanceStatus totalStatus;
 
-    // 2. DetailedAttendance (상세 기록) - 객체 통째로 받기
-    // LEFT JOIN이므로 이 값은 null일 수도 있음.
+    // 리스트가 아니라 '단일 객체'로 받습니다.
     private DetailedAttendance detailedAttendance;
 }

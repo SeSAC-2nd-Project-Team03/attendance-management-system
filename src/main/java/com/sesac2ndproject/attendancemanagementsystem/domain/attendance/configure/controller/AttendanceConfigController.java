@@ -20,14 +20,14 @@ import java.net.URI;
 
 @Tag(name = "Attendance (Admin)", description = "출석 설정 관리 API")
 @RestController
-@RequestMapping("/api/v1/admin/attendance/configure")
+@RequestMapping("/api/v1/admin/attendance-configs")
 @RequiredArgsConstructor
 public class AttendanceConfigController {
 
     private final AttendanceConfigService attendanceConfigService;
 
     @Operation(summary = "출석 설정 생성", description = "관리자가 반, 날짜, 시간별 출석 인증번호를 설정합니다.")
-    @PostMapping("/config")
+    @PostMapping
     public ResponseEntity<ApiResponse<Void>> createAttendanceConfig(
             @Valid @RequestBody AttendanceConfigCreateRequest request
     ) {

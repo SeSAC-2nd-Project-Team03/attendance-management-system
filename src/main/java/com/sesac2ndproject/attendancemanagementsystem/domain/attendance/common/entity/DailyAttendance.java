@@ -118,8 +118,17 @@ public class DailyAttendance extends BaseTimeEntity {
             this.status = AttendanceStatus.PRESENT;
         }
     }
+
     // 출석 상태를 PRESENT로 변경
     public void changeStatusPresent() {
         this.status = AttendanceStatus.PRESENT;
+    }
+
+    // DailyAttendance.java 안에 추가
+    public void changeStatusToOfficialLeave() {
+        this.status = AttendanceStatus.OFFICIAL_LEAVE;
+        this.morningStatus = AttendanceStatus.OFFICIAL_LEAVE;
+        this.lunchStatus = AttendanceStatus.OFFICIAL_LEAVE;
+        this.dinnerStatus = AttendanceStatus.OFFICIAL_LEAVE;
     }
 }

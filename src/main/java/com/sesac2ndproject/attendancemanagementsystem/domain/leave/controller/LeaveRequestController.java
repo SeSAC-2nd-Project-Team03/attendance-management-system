@@ -3,11 +3,15 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.leave.controller;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto.LeaveRequestCreateDto;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto.LeaveRequestResponseDto;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.service.LeaveRequestService;
+import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
+import com.sesac2ndproject.attendancemanagementsystem.global.response.ApiResponse;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveType;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -90,36 +94,49 @@ public class LeaveRequestController {
 
     /**
      * [관리자] 신청 승인
-     * PATCH /api/v1/leave-requests/{id}/approve
+     * PATCH /api/v1/leave-requests/admin/{id}/approve
      */
-    @PatchMapping("/{id}/approve")
-    public ResponseEntity<Void> approveLeaveRequest(
+    @PatchMapping("/admin/{id}/approve")
+    @Operation(summary = "조퇴/결석 신청 승인", description = "신청 상태를 APPROVED로 변경합니다.")
+    public ResponseEntity<ApiResponse<LeaveRequestResponseDto>> approveLeaveRequest(
             @PathVariable Long id,
-            @RequestHeader("Admin-Login-Id") String adminLoginId // 관리자 ID 헤더로 가정
+            @AuthenticationPrincipal Member admin // 현재 로그인한 관리자 정보 가져오기
     ) {
-        leaveRequestService.approveLeaveRequest(id, adminLoginId);
-        return ResponseEntity.ok().build();
+        // 1. 관리자 이름 추출 (보안 컨텍스트에서 가져옴)
+        // admin이 null인 경우(테스트 등) 대비하여 기본값 처리
+        String adminName = (admin != null) ? admin.getName() : "ADMIN";
+
+        // 2. 서비스 호출 (신청서 ID + 관리자 이름 전달)
+        LeaveRequestResponseDto result = leaveRequestService.approveLeaveRequest(id, adminName);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     /**
      * [관리자] 신청 반려
-     * PATCH /api/v1/leave-requests/{id}/reject
-     * Body: 반려 사유 (String or JSON) - 여기선 간단히 RequestParam으로 처리
+     * PATCH /api/v1/leave-requests/admin/{id}/reject
      */
-    @PatchMapping("/{id}/reject")
-    public ResponseEntity<Void> rejectLeaveRequest(
+    @PatchMapping("/admin/{id}/reject")
+    @Operation(summary = "휴가 신청 반려", description = "관리자가 휴가 신청을 반려 처리합니다.")
+    public ResponseEntity<ApiResponse<LeaveRequestResponseDto>> rejectLeaveRequest(
             @PathVariable Long id,
             @RequestParam("reason") String rejectionReason,
-            @RequestHeader("Admin-Login-Id") String adminLoginId
+            @AuthenticationPrincipal Member admin // @RequestHeader 대신 사용
     ) {
-        leaveRequestService.rejectLeaveRequest(id, adminLoginId, rejectionReason);
-        return ResponseEntity.ok().build();
+        // 1. 관리자 이름 추출
+        String adminName = (admin != null) ? admin.getName() : "Unknown Admin";
+
+        // 2. 서비스 호출 (DTO 반환)
+        LeaveRequestResponseDto result = leaveRequestService.rejectLeaveRequest(id, adminName, rejectionReason);
+
+        // 3. 응답 반환
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     // ================= [내부 유틸 메서드] ================= //
 
     /**
-     * 파일 타입 검증 로직 (여기 있네!)
+     * 파일 타입 검증 로직
      */
     private boolean isValidFileType(String contentType) {
         if (contentType == null) {
