@@ -1,14 +1,16 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.controller;
 
-import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveType;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto.LeaveRequestCreateDto;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto.LeaveRequestResponseDto;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.service.LeaveRequestService;
+import com.sesac2ndproject.attendancemanagementsystem.global.type.LeaveType;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -21,70 +23,47 @@ public class LeaveRequestController {
     private final LeaveRequestService leaveRequestService;
 
     /**
-     * 휴가 신청
-     * POST /api/v1/leave-requests
-     *
-     * Parameters:
-     * - leaveDate: 휴가 날짜 (yyyy-MM-dd 또는 yyyyMMdd)
-     * - reason: 신청 사유
-     * - leaveType: 휴가 타입 (EARLY_LEAVE 또는 ABSENCE)
-     * - evidenceFile: 증빙 서류 (이미지/PDF) - 필수
-     * - Student-Login-Id: 회원 LOGIN ID (헤더)
+     * [사용자] 휴가 신청
      */
-    @PostMapping(consumes = {"multipart/form-data"})
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<LeaveRequestResponseDto> createLeaveRequest(
             @RequestParam("leaveDate") String leaveDateStr,
             @RequestParam("reason") String reason,
             @RequestParam("leaveType") LeaveType leaveType,
-            @RequestParam("evidenceFile") MultipartFile evidenceFile,
+            @RequestPart(value = "evidenceFile", required = false) MultipartFile evidenceFile,
             @RequestHeader("Student-Login-Id") String studentLoginId
     ) {
-        try {
-            // 증빙 서류 필수 확인
-            if (evidenceFile == null || evidenceFile.isEmpty()) {
-                return ResponseEntity.badRequest().build();
+        // 1. 파일 검증 (파일이 있을 경우에만)
+        if (evidenceFile != null && !evidenceFile.isEmpty()) {
+            if (!isValidFileType(evidenceFile.getContentType())) {
+                throw new IllegalArgumentException("이미지(jpg, png) 또는 PDF 파일만 첨부 가능합니다.");
             }
-
-            // 파일 타입 검증 (이미지/PDF만 허용)
-            String contentType = evidenceFile.getContentType();
-            if (!isValidFileType(contentType)) {
-                throw new IllegalArgumentException("이미지 또는 PDF 파일만 첨부할 수 있습니다.");
-            }
-
-            // String을 LocalDate로 변환 (yyyyMMdd 또는 yyyy-MM-dd 형식 모두 지원)
-            LocalDate leaveDate;
-            if (leaveDateStr.contains("-")) {
-                leaveDate = LocalDate.parse(leaveDateStr); // yyyy-MM-dd
-            } else {
-                leaveDate = LocalDate.parse(leaveDateStr,
-                        DateTimeFormatter.ofPattern("yyyyMMdd")); // yyyyMMdd
-            }
-
-            LeaveRequestCreateDto dto = LeaveRequestCreateDto.builder()
-                    .leaveDate(leaveDate)
-                    .leaveType(leaveType)
-                    .reason(reason)
-                    .file(evidenceFile)
-                    .build();
-
-            LeaveRequestResponseDto response =
-                    leaveRequestService.createLeaveRequest(studentLoginId, dto, evidenceFile);
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (Exception e) {
-            throw new RuntimeException("파일 업로드 중 오류가 발생했습니다.", e);
         }
+
+        // 2. 날짜 파싱
+        LocalDate leaveDate;
+        if (leaveDateStr.contains("-")) {
+            leaveDate = LocalDate.parse(leaveDateStr);
+        } else {
+            leaveDate = LocalDate.parse(leaveDateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
+        }
+
+        // 3. DTO 생성
+        LeaveRequestCreateDto dto = LeaveRequestCreateDto.builder()
+                .startDate(leaveDate) // 시작일 설정
+                .endDate(leaveDate)   // 종료일도 같은 날짜로 설정 (1일 휴가인 경우)
+                .leaveType(leaveType)
+                .reason(reason)
+                .build();
+
+        LeaveRequestResponseDto response =
+                leaveRequestService.createLeaveRequest(studentLoginId, dto, evidenceFile);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     /**
-     * 내 신청 내역 조회
-     * GET /api/v1/leave-requests/me
-     *
-     * Headers:
-     * - Student-Login-Id: 회원 LOGIN ID
+     * [사용자] 내 신청 내역 조회
      */
     @GetMapping("/me")
     public ResponseEntity<List<LeaveRequestResponseDto>> getMyLeaveRequests(
@@ -96,14 +75,7 @@ public class LeaveRequestController {
     }
 
     /**
-     * 신청 취소 (PENDING 상태만 가능)
-     * DELETE /api/v1/leave-requests/{id}
-     *
-     * Path Variables:
-     * - id: 신청 ID
-     *
-     * Headers:
-     * - Student-Login-Id: 회원 LOGIN ID
+     * [사용자] 신청 취소 (파일 삭제 포함)
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> cancelLeaveRequest(
@@ -114,8 +86,40 @@ public class LeaveRequestController {
         return ResponseEntity.noContent().build();
     }
 
+    // ================= [관리자 기능] ================= //
+
     /**
-     * 파일 타입 검증 (이미지/PDF만 허용)
+     * [관리자] 신청 승인
+     * PATCH /api/v1/leave-requests/{id}/approve
+     */
+    @PatchMapping("/{id}/approve")
+    public ResponseEntity<Void> approveLeaveRequest(
+            @PathVariable Long id,
+            @RequestHeader("Admin-Login-Id") String adminLoginId // 관리자 ID 헤더로 가정
+    ) {
+        leaveRequestService.approveLeaveRequest(id, adminLoginId);
+        return ResponseEntity.ok().build();
+    }
+
+    /**
+     * [관리자] 신청 반려
+     * PATCH /api/v1/leave-requests/{id}/reject
+     * Body: 반려 사유 (String or JSON) - 여기선 간단히 RequestParam으로 처리
+     */
+    @PatchMapping("/{id}/reject")
+    public ResponseEntity<Void> rejectLeaveRequest(
+            @PathVariable Long id,
+            @RequestParam("reason") String rejectionReason,
+            @RequestHeader("Admin-Login-Id") String adminLoginId
+    ) {
+        leaveRequestService.rejectLeaveRequest(id, adminLoginId, rejectionReason);
+        return ResponseEntity.ok().build();
+    }
+
+    // ================= [내부 유틸 메서드] ================= //
+
+    /**
+     * 파일 타입 검증 로직 (여기 있네!)
      */
     private boolean isValidFileType(String contentType) {
         if (contentType == null) {

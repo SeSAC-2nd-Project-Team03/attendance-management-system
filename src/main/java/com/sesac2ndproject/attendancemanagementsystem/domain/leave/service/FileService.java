@@ -1,10 +1,14 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.service;
 
+import com.sesac2ndproject.attendancemanagementsystem.global.util.FileUtil;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,6 +22,28 @@ public class FileService {
 
     @Value("${file.upload.url:http://localhost:9090/api/v1/files}")
     private String uploadUrl;
+
+    /**
+     * 파일 로드 (리소스 반환) - 컨트롤러에서 이동된 로직
+     */
+    public Resource loadFileAsResource(String fileName) {
+        try {
+            Path filePath = Paths.get(uploadPath).resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
+
+            if (resource.exists()) {
+                return resource;
+            } else {
+                throw new RuntimeException("파일을 찾을 수 없습니다: " + fileName);
+            }
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("파일 경로가 잘못되었습니다: " + fileName, e);
+        }
+    }
+
+    public String getContentType(String fileName) {
+        return FileUtil.getContentType(fileName);
+    }
 
     /**
      * 파일 업로드 및 접근 가능한 URL 반환
@@ -44,6 +70,8 @@ public class FileService {
         // 4. 접근 가능한 URL 반환
         return uploadUrl + "/" + uniqueFileName;
     }
+
+
 
     /**
      * 파일 삭제

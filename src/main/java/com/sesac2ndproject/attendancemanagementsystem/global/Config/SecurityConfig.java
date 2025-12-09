@@ -38,29 +38,16 @@ public class SecurityConfig {
 
                 // url별 권한 관리
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/files/**").permitAll()
-                        .requestMatchers("/api/v1/leave-requests/**").permitAll()
-                        .requestMatchers("/h2-console/**").permitAll()
-                        // ↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓↓ 절대절대절대절대절대로 지우지 마세요!
                         .requestMatchers(
+                                "/api/v1/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/h2-console/**"
                         ).permitAll()
 
-                        // 1. 관리자 전용 경로 (/api/v1/admin/**) -> ADMIN 권한만 가능
-                        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
-
-                        // 2. 일반 사용자 경로 (/api/v1/members/**) -> 인증된 누구나 가능 (USER, ADMIN 모두)
-                        .requestMatchers("/api/v1/members/**").authenticated()
-
-                        // 3. 인증 관련 (로그인 등) -> 누구나 가능
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-
-                        // 4. 출석 관련 API -> 테스트용으로 누구나 가능 (추후 인증 필요 시 수정)
-                        .requestMatchers("/api/v1/attendances/**").permitAll()
-                        .requestMatchers("/api/attendance/**").permitAll()
-                        .requestMatchers("/api/v1/**").permitAll()
+                        // 테스트 전용(추후 삭제)
+                        .requestMatchers("/**").permitAll()
 
                         // 나머지는 무조건 인증 필요
                         .anyRequest().authenticated()

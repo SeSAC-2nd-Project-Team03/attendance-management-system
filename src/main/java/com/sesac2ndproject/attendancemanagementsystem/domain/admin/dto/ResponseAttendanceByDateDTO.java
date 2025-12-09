@@ -1,11 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
-import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

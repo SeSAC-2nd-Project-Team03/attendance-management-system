@@ -3,39 +3,40 @@ server:
 
 spring:
   # ----------------------------------------
-  # 🗄️ [공통] H2 데이터베이스 설정 (설치 불필요)
+  # 🗄️ [DB] 데이터베이스 설정 (H2 File 모드)
   # ----------------------------------------
   datasource:
-#    url: jdbc:h2:mem:testdb;MODE=MySQL  # 메모리 DB 사용 (MySQL 모드 호환)
-
-    # ./data/attendance_db 라는 파일에 데이터를 저장하겠다는 의미입니다.
+    # H2 DB 파일을 프로젝트 내 ./data/attendance_db 경로에 저장
     url: jdbc:h2:file:./data/attendance_db;MODE=MySQL;AUTO_SERVER=TRUE
     driver-class-name: org.h2.Driver
     username: sa
-    password:           # 비밀번호 없음
-
-  h2:
-    console:
-      enabled: true     # 브라우저에서 DB 조회 가능하게 설정
-      path: /h2-console # 접속 주소: http://localhost:9090/h2-console
+    password: # 비밀번호 없음 (공란 유지)
 
   # ----------------------------------------
-  # 🏗️ [공통] JPA (ORM) 설정
+  # 🖥️ [H2 Console] 웹 브라우저 DB 접속 설정
+  # ----------------------------------------
+  h2:
+    console:
+      enabled: true      # H2 콘솔 사용 활성화
+      path: /h2-console  # 접속 주소: http://localhost:9090/h2-console
+      settings:
+        web-allow-others: true # 외부 접속 허용 (필요시)
+
+  # ----------------------------------------
+  # 🏗️ [JPA] ORM 설정
   # ----------------------------------------
   jpa:
     defer-datasource-initialization: true
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: update  # 서버 켤 때 테이블 자동 생성/변경 (create-drop은 켤때마다 날아감)
+      ddl-auto: update # 서버 시작 시 테이블 스키마 자동 업데이트
     properties:
       hibernate:
-        format_sql: true # 로그에 SQL 예쁘게 출력
-        show_sql: true   # 실행되는 SQL을 콘솔에 보여줌
-
-
+        format_sql: true # SQL 로그 예쁘게 출력
+        show_sql: true   # 실행되는 SQL 로그 출력
 
   # ----------------------------------------
-  # 📂 [Team C] 파일 업로드 제한 설정
+  # 📂 [File] 파일 업로드 제한 설정
   # ----------------------------------------
   servlet:
     multipart:
@@ -43,29 +44,26 @@ spring:
       max-request-size: 10MB   # 요청 전체 최대 크기
 
   # ----------------------------------------
-  # 🔒 [보안] CSRF 설정 (개발 단계에서만 비활성화)
+  # 🔒 [Security] 보안 설정
   # ----------------------------------------
   security:
     csrf:
-      enabled: false
+      enabled: false # 개발 단계에서는 CSRF 보안 비활성화
 
 # ==========================================
-# 🔐 [Team A] JWT 커스텀 설정
+# 🔐 [JWT] 토큰 설정 (Team A)
 # ==========================================
 jwt:
-  # HS512 알고리즘을 위해 64바이트(512비트) 이상의 긴 문자열이 필요합니다.
-  # 개발용 임시 키입니다. (배포 시에는 application-secret.yml로 분리 권장)
+  # HS512 알고리즘용 비밀키 (임시 키)
   secret: "v3rY-s3cr3t-k3y-f0r-Att3ndanc3-M4nag3m3nt-Sy5t3m-k3y-must-b3-l0ng-3nough"
-  expiration: 3600000 # 1시간 (밀리초 단위: 1000 * 60 * 60)
+  expiration: 3600000 # 1시간 (3600000ms)
 
 # ==========================================
-# 📂 [Team C] 파일 저장 경로 커스텀 설정
+# 📂 [File] 파일 저장 경로 설정 (Team C)
 # ==========================================
 file:
-    upload:
-      path: C:/uploads/leave-files  # 최종 저장 경로 # 프로젝트 루트 폴더에 'uploads' 폴더 생성 후 저장
-      url: http://localhost:9090/api/v1/files
-    file:
-      upload:
-        path: uploads/leave-files
-        url: http://localhost:9090/api/v1/files
+  upload:
+    # 로컬 저장 경로 (Windows: C:/..., Mac/Linux: /Users/...)
+    path: ./uploads/leave-files
+    # 파일 접근 URL (FileController와 매핑)
+    url: http://localhost:9090/api/v1/files

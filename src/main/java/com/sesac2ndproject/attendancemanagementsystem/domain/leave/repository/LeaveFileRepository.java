@@ -10,9 +10,9 @@ import java.util.Optional;
 @Repository
 public interface LeaveFileRepository extends JpaRepository<LeaveFile, Long> {
 
-    // Leave ID로 관련 파일 모두 조회
-    List<LeaveFile> findByLeaveId(Long leaveId);
+    // 변경된 필드명(leaveRequest)에 맞춰 메서드명 수정: findByLeaveId -> findByLeaveRequestId
+    List<LeaveFile> findByLeaveRequest_Id(Long leaveRequestId);
 
-    // 파일명으로 조회
-    Optional<LeaveFile> findByStoredFileName(String storedFileName);
+    // 필요시 유지, 사용 안 하면 삭제 가능
+    void deleteByLeaveRequest_Id(Long leaveRequestId);
 }
