@@ -1,5 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.service;
 
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.response.DailyAttendanceResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.entity.AttendanceConfig;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.repository.AttendanceConfigRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.event.AttendanceLogCreatedEvent;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -116,6 +118,50 @@ public class AttendanceCommandService {
             }
         }
         return count;
+    }
+
+    //    - [ ]  **출석 상태 강제 변경 API** (`PUT /api/v1/admin/attendances/{id}`): 시스템 판정과 상관없이 관리자가 상태(예: 지각→출석)를 직접 수정16.
+    @Transactional
+    public DailyAttendanceResponse statusPresenceChange (Long id) {
+        // 1. DailyAttendance에서 id에 해당하는 value 찾아오기
+        Optional<DailyAttendance> dailyAttendanceOptional = dailyAttendanceRepository.findById(id);
+        DailyAttendance dailyAttendance = dailyAttendanceOptional
+                .orElseThrow(() -> new IllegalArgumentException("해당 출석부를 찾을 수 없습니다."));
+        // 2. 상태 변경(AttendanceStatus -> PRESENT)
+        dailyAttendance.changeStatusPresent();
+        // 3. 변경된 결과를 DTO로 변환하여 반환.
+        return DailyAttendanceResponse.builder()
+                .id(dailyAttendance.getId())
+                .memberId(dailyAttendance.getMemberId())
+                .courseId(dailyAttendance.getCourseId())
+                .date(dailyAttendance.getDate())
+                .morningStatus(dailyAttendance.getMorningStatus())
+                .lunchStatus(dailyAttendance.getLunchStatus())
+                .dinnerStatus(dailyAttendance.getDinnerStatus())
+                .status(dailyAttendance.getStatus())
+                .build();
+
+    }
+
+    /**
+     * [시스템/연동] 휴가 승인 시 출석 상태 업데이트
+     * LeaveRequestService에서 호출됨
+     */
+    public void applyLeaveEffect(Long memberId, LocalDate date) {
+        // 1. 해당 날짜의 출석부 조회 (없으면 생성)
+        DailyAttendance attendance = dailyAttendanceRepository.findByMemberIdAndCourseIdAndDate(memberId, 1L, date) // TODO: 1L은 실제 CourseId 로직 필요
+                .orElseGet(() -> DailyAttendance.builder()
+                        .memberId(memberId)
+                        .courseId(1L) // TODO: CourseId 조회 로직 필요 (Enrollment 등 활용)
+                        .date(date)
+                        .build());
+
+        // 2. 상태를 공결(OFFICIAL_LEAVE)로 변경
+        // (DailyAttendance 엔티티에 updateStatus 메서드가 없다면, setter나 별도 메서드 추가 필요)
+        attendance.changeStatusToOfficialLeave();
+
+        // 3. 저장
+        dailyAttendanceRepository.save(attendance);
     }
 
     // ================== Private Helpers ==================

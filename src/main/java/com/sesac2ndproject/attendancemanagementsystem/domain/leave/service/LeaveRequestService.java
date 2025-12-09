@@ -1,5 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.service;
 
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.service.AttendanceCommandService;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto.LeaveRequestCreateDto;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.dto.LeaveRequestResponseDto;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveRequest;
@@ -30,6 +31,7 @@ public class LeaveRequestService {
     private final LeaveRequestRepository leaveRequestRepository;
     private final MemberRepository memberRepository;
     private final FileService fileService;
+    private final AttendanceCommandService attendanceCommandService;
 
     /**
      * 휴가 신청 생성 (파일 포함)
@@ -101,21 +103,36 @@ public class LeaveRequestService {
     /**
      * [관리자] 휴가 승인
      */
-    public void approveLeaveRequest(Long leaveId, String adminName) {
+    public LeaveRequestResponseDto approveLeaveRequest(Long leaveId, String adminName) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveId)
-                .orElseThrow(() -> new IllegalArgumentException("신청 내역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("신청을 찾을 수 없습니다."));
 
+        // 1. 상태 변경
         leaveRequest.approve(adminName);
+
+        // 2. 출석 상태 변경 (연동)
+        attendanceCommandService.applyLeaveEffect(leaveRequest.getMember().getId(), leaveRequest.getStartDate());
+
+        // 3. 변경된 엔티티 -> DTO 변환 및 반환 (저장된 객체 사용)
+        LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+        return LeaveRequestResponseDto.from(saved);
     }
 
     /**
      * [관리자] 휴가 반려
      */
-    public void rejectLeaveRequest(Long leaveId, String adminName, String rejectReason) {
+    public LeaveRequestResponseDto rejectLeaveRequest(Long leaveId, String adminName, String rejectReason) {
         LeaveRequest leaveRequest = leaveRequestRepository.findById(leaveId)
-                .orElseThrow(() -> new IllegalArgumentException("신청 내역을 찾을 수 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("신청을 찾을 수 없습니다."));
 
+        // 1. 상태 변경 (반려)
         leaveRequest.reject(adminName, rejectReason);
+
+        // 2. 저장 (변경 사항 DB 반영)
+        LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+
+        // 3. DTO 변환 및 반환
+        return LeaveRequestResponseDto.from(saved);
     }
 
     /**

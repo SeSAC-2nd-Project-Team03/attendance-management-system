@@ -1,11 +1,10 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.controller;
 
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.response.DailyAttendanceResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.dto.AttendanceAutoCheckRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.service.AttendanceCommandService;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.request.AttendanceCheckRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.response.AttendanceCheckResponse;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.dto.MyAttendanceResponse;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.service.AttendanceQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,11 +16,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
 
 /**
  * 출석 관리 API
@@ -37,6 +33,7 @@ public class AttendanceCommandController {
 
     /**
      * 출석 체크 API (타입 직접 지정)
+     * POST /api/v1/attendances
      */
     @PostMapping
     @Operation(
@@ -141,6 +138,7 @@ public class AttendanceCommandController {
 
     /**
      * 자동 출석 체크 API (시간 기반 타입 자동 판단)
+     * POST /api/v1/attendances/auto
      */
     @PostMapping("/auto")
     @Operation(
@@ -213,6 +211,7 @@ public class AttendanceCommandController {
 
     /**
      * 레거시 출석 체크 API
+     * POST /api/v1/attendances/check-in
      */
     @PostMapping("/check-in")
     @Operation(summary = "출석 체크 (레거시)", description = "레거시 경로 호환용")
@@ -229,6 +228,19 @@ public class AttendanceCommandController {
                 connectionIp
         );
         return ResponseEntity.ok(response);
+    }
+
+    /**
+     * [관리자] 출석 상태 강제 변경 API
+     * PATCH /api/v1/attendances/admin/{id}
+     * 수정 경로: "/admin/{id}"
+     * -> /api/v1/attendances/admin/{id} (깔끔함)
+     */
+    @PatchMapping("/admin/{id}")
+    @Operation(summary = "출석 상태 변경(출석)", description = "시스템 판정과 상관없이 관리자가 상태(예: 지각→출석)를 직접 수정.")
+    public ResponseEntity<com.sesac2ndproject.attendancemanagementsystem.global.response.ApiResponse<DailyAttendanceResponse>> changeDailyAttendancePresentStatus(@PathVariable Long id) {
+        DailyAttendanceResponse result = attendanceCommandService.statusPresenceChange(id);
+        return ResponseEntity.ok(com.sesac2ndproject.attendancemanagementsystem.global.response.ApiResponse.success(result));
     }
 
 

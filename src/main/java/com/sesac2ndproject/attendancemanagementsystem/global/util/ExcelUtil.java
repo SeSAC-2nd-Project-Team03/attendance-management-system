@@ -1,6 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.global.util;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.dto.ResponseAttendanceFlatDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class ExcelUtil {
-    public static byte[] createExcelFile(List<ResponseByDateAndCourseIdDTO> dataList) throws IOException {
+    public static byte[] createExcelFile(List<ResponseAttendanceFlatDTO> dataList) throws IOException {
         try (Workbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream baout = new ByteArrayOutputStream()) {
 
@@ -33,13 +33,13 @@ public class ExcelUtil {
 
             // 데이터 생성(Row 1~n)
             int rowIdx = 1;
-            for (ResponseByDateAndCourseIdDTO dto : dataList){
+            for (ResponseAttendanceFlatDTO dto : dataList){
                 Row row = sheet.createRow(rowIdx++); // 해당하는 rowIndex로 Row를 만든 후 +1
 
-                row.createCell(0).setCellValue(dto.getDate().toString());
+                row.createCell(0).setCellValue(dto.getWorkDate().toString());
                 row.createCell(1).setCellValue(dto.getMemberId());
                 row.createCell(2).setCellValue(dto.getMemberName());
-                row.createCell(3).setCellValue(dto.getStatus().getDescription());
+                row.createCell(3).setCellValue(dto.getTotalStatus().getDescription());
                 row.createCell(4).setCellValue(dto.getCourseId());
                 row.createCell(5).setCellValue(dto.getCourseName());
                 // 상세 데이터(detailedAttendance) 존재 여부에 따라 넣을 값 결정

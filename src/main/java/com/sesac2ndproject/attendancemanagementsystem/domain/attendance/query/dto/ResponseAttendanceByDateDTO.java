@@ -1,4 +1,4 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.dto;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
@@ -48,21 +48,4 @@ public class ResponseAttendanceByDateDTO {
         }
     }
 
-    // ==========================================
-    // [New] Repository에서 DB 데이터를 1줄씩 받아올 임시 DTO
-    // ==========================================
-    @Getter
-    @AllArgsConstructor
-    public static class FlatResponse {
-        private Long dailyAttendanceId;
-        private Long memberId;
-        private String memberName;
-        private Long courseId;
-        private String courseName;
-        private LocalDate workDate;
-        private AttendanceStatus totalStatus;
-
-        // 리스트가 아니라 '단일 객체'로 받습니다.
-        private DetailedAttendance detailedAttendance;
-    }
 }
