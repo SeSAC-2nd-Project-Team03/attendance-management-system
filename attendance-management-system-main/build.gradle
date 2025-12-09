@@ -1,0 +1,86 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '4.0.0'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.sesac2ndproject'
+version = '0.0.1-SNAPSHOT'
+description = 'attendance-management-system'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // ==========================================
+    // 🏗️ [공통] 프로젝트 기반 (All Teams)
+    // ==========================================
+    implementation 'org.springframework.boot:spring-boot-starter-web' // REST API
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa' // DB 접근 (ORM)
+    implementation 'org.springframework.boot:spring-boot-starter-validation' // 데이터 검증 (@NotNull 등)
+
+    // 편의 도구
+    compileOnly 'org.projectlombok:lombok' // Getter, Setter, Builder 자동화
+    annotationProcessor 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools' // 서버 자동 재시작
+
+    // ==========================================
+    // 🗄️ [DB] 데이터베이스 (All Teams)
+    // ==========================================
+    // 개발 단계: H2 (메모리 DB - 설치 없이 바로 실행 가능)
+     runtimeOnly 'com.h2database:h2'
+    // 운영 단계: MySQL (실제 배포 시 사용, 필요하면 주석 해제)
+//    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // ==========================================
+    // 🔐 [Team A] 인증/보안 (Auth & Member)
+    // ==========================================
+    implementation 'org.springframework.boot:spring-boot-starter-security' // 스프링 시큐리티
+
+    // JWT (JSON Web Token) 라이브러리 (0.11.5 버전 기준)
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // ==========================================
+    // 📂 [Team C] 파일 업로드 (Leave & File)
+    // ==========================================
+    // 파일 입출력 유틸 (파일명 처리 등에 유용)
+    implementation 'commons-io:commons-io:2.14.0'
+
+    // ==========================================
+    // 📊 [Team D] 엑셀/관리자 (Admin & Stats)
+    // ==========================================
+    // 엑셀 다운로드를 위한 Apache POI
+    implementation 'org.apache.poi:poi:5.2.3'
+    implementation 'org.apache.poi:poi-ooxml:5.4.0'
+
+    // ==========================================
+    // 📄 [문서화] Swagger/OpenAPI (All Teams)
+    // ==========================================
+    // API 명세서 자동 생성 (http://localhost:9090/swagger-ui/index.html)
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.0'
+
+    // ==========================================
+    // 🧪 [테스트] (All Teams)
+    // ==========================================
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

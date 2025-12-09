@@ -1,0 +1,58 @@
+### Java ###
+*.class
+
+### Mobile Tools for Java (J2ME) ###
+.mtj.tmp/
+
+### Package Files ###
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+### Gradle ###
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### IntelliJ IDEA ###
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### Visual Studio Code ###
+.vscode/
+
+### MAC OS ###
+.DS_Store
+
+### Logs ###
+logs/
+*.log
+
+### ⚠️ [보안] 설정 파일 (Team A 주의) ###
+# DB 비밀번호나 JWT Secret Key가 들어있는 파일은 절대 커밋 금지
+# 로컬 개발용 설정 파일은 무시하고, application-template.yml만 올리는 것을 권장
+application-secret.yml
+application-dev.yml
+application-prod.yml
+.env
+
+### 📂 [파일 업로드] (Team C 주의) ###
+# 로컬 테스트 시 업로드되는 파일들이 저장되는 폴더 무시
+uploads/
+files/
+local-storage/
+
+### Test Results ###
+test-results/
+/data
