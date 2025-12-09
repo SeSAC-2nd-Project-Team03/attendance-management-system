@@ -1,11 +1,11 @@
 package com.sesac2ndproject.attendancemanagementsystem.global.Config;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.entity.AttendanceConfig;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DailyAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.repository.AttendanceConfigRepository;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DetailedAttendanceRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.repository.DailyAttendanceRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.repository.DetailedAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Course;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.CourseRepository;

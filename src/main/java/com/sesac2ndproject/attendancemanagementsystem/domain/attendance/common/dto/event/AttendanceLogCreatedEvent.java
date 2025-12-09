@@ -1,4 +1,4 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.event;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.event;
 
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;
 import lombok.AllArgsConstructor;

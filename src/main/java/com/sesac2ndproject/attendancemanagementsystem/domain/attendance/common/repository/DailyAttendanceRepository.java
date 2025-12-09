@@ -1,6 +1,6 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.repository;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DailyAttendance;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;

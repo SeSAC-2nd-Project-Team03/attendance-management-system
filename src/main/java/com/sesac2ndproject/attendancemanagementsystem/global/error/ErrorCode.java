@@ -39,6 +39,7 @@ public enum ErrorCode {
     // LeaveException 대체
     LEAVE_NOT_FOUND(HttpStatus.NOT_FOUND, "L001", "휴가 신청 내역을 찾을 수 없습니다."),
     CANNOT_CANCEL_LEAVE(HttpStatus.BAD_REQUEST, "L002", "이미 승인/반려된 휴가는 취소할 수 없습니다."),
+    ACCESS_DENIED(HttpStatus.FORBIDDEN, "L003", "접근 권한이 없습니다."),
 
     // FileException 대체
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "F001", "파일을 찾을 수 없습니다."),

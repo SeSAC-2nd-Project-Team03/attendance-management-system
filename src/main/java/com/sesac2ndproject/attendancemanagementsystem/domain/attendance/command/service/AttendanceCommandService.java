@@ -2,12 +2,12 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.entity.AttendanceConfig;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.configure.repository.AttendanceConfigRepository;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.event.AttendanceLogCreatedEvent;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response.AttendanceCheckResponse;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DetailedAttendanceRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.event.AttendanceLogCreatedEvent;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.response.AttendanceCheckResponse;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DailyAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.repository.DailyAttendanceRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.repository.DetailedAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.global.error.exception.*;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;

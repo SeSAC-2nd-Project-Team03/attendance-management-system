@@ -2,8 +2,8 @@ package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.dto.AttendanceAutoCheckRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.command.service.AttendanceCommandService;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.request.AttendanceCheckRequest;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response.AttendanceCheckResponse;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.request.AttendanceCheckRequest;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.response.AttendanceCheckResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.dto.MyAttendanceResponse;
 import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.query.service.AttendanceQueryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,18 +28,17 @@ import java.time.LocalDate;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/attendance/execute")
+@RequestMapping("/api/v1/attendances")
 @RequiredArgsConstructor
 @Tag(name = "Attendance (Command)", description = "출석 체크 및 상태 변경 API")
 public class AttendanceCommandController {
 
     private final AttendanceCommandService attendanceCommandService;
-    private final AttendanceQueryService attendanceQueryService;
 
     /**
      * 출석 체크 API (타입 직접 지정)
      */
-    @PostMapping("/v1/attendances")
+    @PostMapping
     @Operation(
             summary = "출석 체크",
             description = """
@@ -143,7 +142,7 @@ public class AttendanceCommandController {
     /**
      * 자동 출석 체크 API (시간 기반 타입 자동 판단)
      */
-    @PostMapping("/v1/attendances/auto")
+    @PostMapping("/auto")
     @Operation(
             summary = "자동 출석 체크",
             description = """
@@ -215,7 +214,7 @@ public class AttendanceCommandController {
     /**
      * 레거시 출석 체크 API
      */
-    @PostMapping("/attendance/check-in")
+    @PostMapping("/check-in")
     @Operation(summary = "출석 체크 (레거시)", description = "레거시 경로 호환용")
     public ResponseEntity<AttendanceCheckResponse> checkIn(
             @Valid @RequestBody AttendanceCheckRequest request,
@@ -232,37 +231,6 @@ public class AttendanceCommandController {
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 내 출석 조회 API
-     */
-    @GetMapping("/v1/attendances/me")
-    @Operation(
-            summary = "내 출석 조회",
-            description = """
-            특정 날짜의 출석 현황을 조회합니다.
-            
-            **상태 계산 규칙:**
-            - O + O + O → 출석
-            - △ + O + O → 지각
-            - X + O + O → 지각
-            - O + O + X → 조퇴
-            - X + X + X → 결석
-            """
-    )
-    public ResponseEntity<MyAttendanceResponse> getMyAttendance(
-            @Parameter(description = "회원 ID") @RequestParam Long memberId,
-            @Parameter(description = "강의 ID") @RequestParam Long courseId,
-            @Parameter(description = "조회 날짜 (기본: 오늘)") 
-            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date
-    ) {
-        if (date == null) {
-            date = LocalDate.now();
-        }
-        log.info("GET /api/v1/attendances/me - memberId: {}, courseId: {}, date: {}", memberId, courseId, date);
-        
-        MyAttendanceResponse response = attendanceQueryService.getMyAttendance(memberId, courseId, date);
-        return ResponseEntity.ok(response);
-    }
 
     /**
      * IP 주소 추출

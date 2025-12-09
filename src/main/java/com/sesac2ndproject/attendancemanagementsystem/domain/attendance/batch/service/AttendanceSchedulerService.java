@@ -1,7 +1,7 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.batch.service;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DailyAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.repository.DailyAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceRule;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import lombok.RequiredArgsConstructor;

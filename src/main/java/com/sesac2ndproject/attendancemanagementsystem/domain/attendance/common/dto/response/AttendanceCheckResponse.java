@@ -1,4 +1,4 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.dto.response;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;

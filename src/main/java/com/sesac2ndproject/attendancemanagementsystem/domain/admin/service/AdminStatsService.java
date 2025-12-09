@@ -1,25 +1,20 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.service;
 
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.*;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DailyAttendance;
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository.DailyAttendanceRepository;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DailyAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.repository.DailyAttendanceRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.repository.EnrollmentRepository;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity.LeaveRequest;
 import com.sesac2ndproject.attendancemanagementsystem.domain.leave.repository.LeaveRequestRepository;
-import com.sesac2ndproject.attendancemanagementsystem.global.type.EnrollmentStatus;
 import com.sesac2ndproject.attendancemanagementsystem.global.util.CsvUtil;
 import com.sesac2ndproject.attendancemanagementsystem.global.util.ExcelUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -86,19 +81,19 @@ public class AdminStatsService {
     //        - *(Tip: 승인 시 Team B의 `DailyAttendance` 상태를 업데이트하는 로직을 호출하거나, Team B와 협의 필요)*
     private final LeaveRequestRepository leaveRequestRepository;
     @Transactional
-    public LeaveRequestResponseDTO requestApprove(Long id) {
+    public LeaveRequestResponseDTO requestApprove(Long id, String adminName) {
         // 1. id로 신청서 찾기 (없으면 예외 발생)
         LeaveRequest leaveRequest = leaveRequestRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("해당 신청서를 찾을 수 없습니다. id=" + id));
         // 2. 상태 변경( status -> APPROVED)
-        leaveRequest.approve(); // 엔티티 메서드 사용.
+        leaveRequest.approve(adminName);; // 엔티티 메서드 사용.
 
         // 3. 변경된 결과를 DTO로 변환하여 반환.
         return LeaveRequestResponseDTO.builder()
                 .id(leaveRequest.getId())
                 .memberId(leaveRequest.getMemberId().getId())
                 .memberName(leaveRequest.getMemberId().getName())
-                .targetDate(leaveRequest.getTarget_date())
+                .targetDate(leaveRequest.getStartDate())
                 .type(leaveRequest.getType())
                 .status(leaveRequest.getStatus())
                 .reason(leaveRequest.getReason())

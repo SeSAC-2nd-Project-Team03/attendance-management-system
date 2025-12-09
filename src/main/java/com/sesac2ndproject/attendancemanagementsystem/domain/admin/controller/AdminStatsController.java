@@ -6,8 +6,10 @@ import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseA
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto.ResponseByDateAndCourseIdDTO;
 import com.sesac2ndproject.attendancemanagementsystem.domain.admin.service.AdminStatsService;
 import com.sesac2ndproject.attendancemanagementsystem.domain.course.entity.Enrollment;
+import com.sesac2ndproject.attendancemanagementsystem.domain.member.entity.Member;
 import com.sesac2ndproject.attendancemanagementsystem.global.response.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -15,6 +17,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -67,10 +70,21 @@ public class AdminStatsController {
 
 
     //    - [ ]  **조퇴/결석 승인 처리 API** (`PATCH /api/v1/admin/leaves/{id}`): 신청 상태를 `APPROVED`로 변경15.
-    @PatchMapping("/leave/{id}")
-    @Operation(summary = "조퇴/결석 신청 승인", description = "신청 상태를 APPROVED로 변경")
-    public ResponseEntity<ApiResponse<LeaveRequestResponseDTO>> approveLeaveRequest(@PathVariable Long id) {
-        LeaveRequestResponseDTO result = adminStatsService.requestApprove(id);
+    // URL: PATCH /api/v1/admin/leaves/{id} (표준 REST는 복수형 leaves 권장)
+    @PatchMapping("/leaves/{id}")
+    @Operation(summary = "조퇴/결석 신청 승인", description = "신청 상태를 APPROVED로 변경합니다.")
+    public ResponseEntity<ApiResponse<LeaveRequestResponseDTO>> approveLeaveRequest(
+            @Parameter(description = "휴가 신청서 ID (LeaveRequest PK)", required = true)
+            @PathVariable Long id,
+            @AuthenticationPrincipal Member admin // 현재 로그인한 관리자 정보 가져오기
+    ) {
+        // 1. 관리자 이름 추출 (보안 컨텍스트에서 가져옴)
+        // admin이 null인 경우(테스트 등) 대비하여 기본값 처리
+        String adminName = (admin != null) ? admin.getName() : "ADMIN";
+
+        // 2. 서비스 호출 (신청서 ID + 관리자 이름 전달)
+        LeaveRequestResponseDTO result = adminStatsService.requestApprove(id, adminName);
+
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 

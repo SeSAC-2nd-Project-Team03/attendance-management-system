@@ -1,6 +1,6 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.repository;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.repository;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

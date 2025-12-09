@@ -1,6 +1,6 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.admin.dto;
 
-import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity.DetailedAttendance;
+import com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity.DetailedAttendance;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,4 +1,4 @@
-package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.entity;
+package com.sesac2ndproject.attendancemanagementsystem.domain.attendance.common.entity;
 
 import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
 import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceStatus;

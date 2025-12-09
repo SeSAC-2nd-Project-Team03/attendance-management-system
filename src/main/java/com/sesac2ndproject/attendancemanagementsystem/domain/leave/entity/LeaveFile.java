@@ -1,124 +1,41 @@
 package com.sesac2ndproject.attendancemanagementsystem.domain.leave.entity;
 
+import com.sesac2ndproject.attendancemanagementsystem.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "leave_files")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class LeaveFile {
+@Builder
+public class LeaveFile extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 어떤 신청서에 달린 파일인지 (FK) -> Leave 대신 LeaveRequest 사용
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "leave_id", nullable = false)
-    private Leave leave;
+    @JoinColumn(name = "leave_request_id", nullable = false)
+    private LeaveRequest leaveRequest;
 
-    // 원본 파일명
+    // 원본 파일명 (예: 진단서.pdf)
     @Column(nullable = false)
     private String originalFileName;
 
-    // 저장된 파일명
+    // 저장된 파일명 (예: uuid_진단서.pdf) - S3 URL 등
     @Column(nullable = false)
-    private String storedFileName;
+    private String fileUrl;
 
-    // 파일 경로 (접근 가능한 URL)
-    @Column(nullable = false)
-    private String filePath;
-
-    // 파일 크기 (바이트)
+    // 파일 크기
     @Column
     private Long fileSize;
 
-    // 파일 MIME 타입
+    // 파일 타입 (image/png 등)
     @Column
     private String mimeType;
-
-    // 생성 일시
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    public void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    // Builder 메서드 직접 구현
-    public static LeaveFileBuilder builder() {
-        return new LeaveFileBuilder();
-    }
-
-    public static class LeaveFileBuilder {
-        private Long id;
-        private Leave leave;
-        private String originalFileName;
-        private String storedFileName;
-        private String filePath;
-        private Long fileSize;
-        private String mimeType;
-        private LocalDateTime createdAt;
-
-        public LeaveFileBuilder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public LeaveFileBuilder leave(Leave leave) {
-            this.leave = leave;
-            return this;
-        }
-
-        public LeaveFileBuilder originalFileName(String originalFileName) {
-            this.originalFileName = originalFileName;
-            return this;
-        }
-
-        public LeaveFileBuilder storedFileName(String storedFileName) {
-            this.storedFileName = storedFileName;
-            return this;
-        }
-
-        public LeaveFileBuilder filePath(String filePath) {
-            this.filePath = filePath;
-            return this;
-        }
-
-        public LeaveFileBuilder fileSize(Long fileSize) {
-            this.fileSize = fileSize;
-            return this;
-        }
-
-        public LeaveFileBuilder mimeType(String mimeType) {
-            this.mimeType = mimeType;
-            return this;
-        }
-
-        public LeaveFileBuilder createdAt(LocalDateTime createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-
-        public LeaveFile build() {
-            LeaveFile leaveFile = new LeaveFile();
-            leaveFile.id = this.id;
-            leaveFile.leave = this.leave;
-            leaveFile.originalFileName = this.originalFileName;
-            leaveFile.storedFileName = this.storedFileName;
-            leaveFile.filePath = this.filePath;
-            leaveFile.fileSize = this.fileSize;
-            leaveFile.mimeType = this.mimeType;
-            leaveFile.createdAt = this.createdAt;
-            return leaveFile;
-        }
-    }
 }
