@@ -91,8 +91,8 @@ public class AdminStatsService {
         // 3. 변경된 결과를 DTO로 변환하여 반환.
         return LeaveRequestResponseDTO.builder()
                 .id(leaveRequest.getId())
-                .memberId(leaveRequest.getMemberId().getId())
-                .memberName(leaveRequest.getMemberId().getName())
+                .memberId(leaveRequest.getMember().getId())
+                .memberName(leaveRequest.getMember().getName())
                 .targetDate(leaveRequest.getStartDate())
                 .type(leaveRequest.getType())
                 .status(leaveRequest.getStatus())

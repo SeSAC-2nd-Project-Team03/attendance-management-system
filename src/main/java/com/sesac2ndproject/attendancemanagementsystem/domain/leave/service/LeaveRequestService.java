@@ -123,7 +123,7 @@ public class LeaveRequestService {
      */
     @Transactional(readOnly = true)
     public List<LeaveRequestResponseDto> getMyLeaveRequests(String studentLoginId) {
-        return leaveRequestRepository.findByMember_LoginIdOrderByCreatedDateDesc(studentLoginId)
+        return leaveRequestRepository.findByMember_LoginIdOrderByCreatedAtDesc(studentLoginId)
                 .stream()
                 .map(LeaveRequestResponseDto::from)
                 .collect(Collectors.toList());
