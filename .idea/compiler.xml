@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
@@ -16,6 +17,9 @@
       <module name="attendance-management-system" options="-parameters" />
       <module name="attendance-management-system.main" options="-parameters" />
       <module name="attendance-management-system.test" options="-parameters" />
+      <module name="com.sesac2ndproject.attendance-management-system" options="-parameters" />
+      <module name="com.sesac2ndproject.attendance-management-system.main" options="-parameters" />
+      <module name="com.sesac2ndproject.attendance-management-system.test" options="-parameters" />
     </option>
   </component>
 </project>
