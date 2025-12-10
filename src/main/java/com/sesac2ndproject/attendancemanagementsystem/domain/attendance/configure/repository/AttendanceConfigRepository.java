@@ -5,7 +5,6 @@ import com.sesac2ndproject.attendancemanagementsystem.global.type.AttendanceType
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
 public interface AttendanceConfigRepository extends JpaRepository<AttendanceConfig, Long> {
@@ -16,6 +15,4 @@ public interface AttendanceConfigRepository extends JpaRepository<AttendanceConf
             LocalDate targetDate,
             AttendanceType type
     );
-
-    List<AttendanceConfig> findAllByCourseIdOrderByTargetDateDesc(Long courseId);
 }
