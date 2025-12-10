@@ -46,6 +46,8 @@ public class SecurityConfig {
                                 "/h2-console/**"
                         ).permitAll()
 
+                        .requestMatchers("/api/v1/admin/**", "/api/v1/**/admin/**").hasRole("ADMIN")
+
                         // 테스트 전용(추후 삭제)
                         .requestMatchers("/**").permitAll()
 

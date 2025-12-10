@@ -173,7 +173,7 @@ public class DataInitializer implements CommandLineRunner {
             // 🔵 케이스 1: 모두 출석 (student1)
             // 아침(O) + 점심(O) + 저녁(O) → PRESENT
             // ============================================
-            
+
             // 1) 아침 출석 (정시)
             detailedAttendanceRepository.save(DetailedAttendance.builder()
                     .memberId(s1.getId())
@@ -219,7 +219,7 @@ public class DataInitializer implements CommandLineRunner {
             // 🟡 케이스 2: 지각 (student2)
             // 아침(X) + 점심(O) + 저녁(O) → LATE
             // ============================================
-            
+
             // 1) 아침 결석 (시간 초과)
             detailedAttendanceRepository.save(DetailedAttendance.builder()
                     .memberId(s2.getId())
@@ -265,7 +265,7 @@ public class DataInitializer implements CommandLineRunner {
             // 🟠 케이스 3: 조퇴 (student3)
             // 아침(O) + 점심(O) + 저녁(X) → LEAVE
             // ============================================
-            
+
             // 1) 아침 출석 (정시)
             detailedAttendanceRepository.save(DetailedAttendance.builder()
                     .memberId(s3.getId())
