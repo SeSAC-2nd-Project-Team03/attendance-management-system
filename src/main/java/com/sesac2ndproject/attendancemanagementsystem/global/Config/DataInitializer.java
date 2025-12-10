@@ -327,7 +327,7 @@ public class DataInitializer implements CommandLineRunner {
 
                 Notice notice = Notice.builder()
                         .title(titlePrefix + "테스트 공지사항 " + i + "입니다.")
-                        .content("안녕하세요. 테스트 공지사항 내용입니다. <br> 번호: " + i + "<br> 화이팅하세요!")
+                        .content("안녕하세요. 테스트 공지사항 내용입니다. \n번호: " + i + " \n화이팅하세요!")
                         .writer(admin) // 관리자 작성
                         .viewCount((long) (Math.random() * 10001))
                         .isPopup(isPopup)
